@@ -16,6 +16,6 @@ document.forms['feedbackform'].addEventListener('submit', (event) => {
     }).then((body) => {
         console.log(body);
     }).catch((error) => {
-        // TODO handle error
+        
     });
 });
