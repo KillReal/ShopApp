@@ -1,107 +1,21 @@
-import { type } from "os";
+import {Cart, Feedback, Product, ProductList, User} from "./models";
 
 var http = require('http');
 var path = require('path');
 var sha1 = require('sha1');
-const Sequelize = require('sequelize')
 const querystring = require('querystring')
 var mime = require('mime-types')
 var ejs = require("ejs");
-const sequelize = new Sequelize('postgres://postgres:123@localhost:5432/webSite', {
-    logging: false
-});
-
-sequelize
-.authenticate()
-.then(() => {
-    console.log('Connection has been established successfully.');
-})
-.catch((err: any) => {
-    console.error('Unable to connect to the database:', err);
-});
 
 
 function parseCookies(str :any) 
 {
     let rx = /([^;=\s]*)=([^;]*)/g;
     let obj: any = { };
-    for ( let m ; m = rx.exec(str) ; )
+    for (let m ; m = rx.exec(str) ; )
       obj[ m[1] ] = decodeURIComponent( m[2] );
     return obj;
 }
-
-const User = sequelize.define('User', {
-    email: {
-        type: Sequelize.STRING
-    },
-    password: {
-        type: Sequelize.STRING
-    },
-    cookie: {
-        type: Sequelize.STRING
-    },
-    cookieExpire: {
-        type: Sequelize.DATE
-    }
-}, {
-    
-});
-
-const Product = sequelize.define('Product', {
-    imgUrl: { 
-        type: Sequelize.STRING
-    },
-    name: {
-        type: Sequelize.STRING
-    },
-    description: {
-        type: Sequelize.STRING
-    },
-    price: {
-        type: Sequelize.INTEGER
-    },
-    discontPrice: {
-        type: Sequelize.INTEGER
-    },
-    inStock: {
-        type: Sequelize.INTEGER
-    }
-}, {
-    
-});
-
-const Cart = sequelize.define('Cart', {
-    productCount: {
-        type: Sequelize.INTEGER
-    },
-    isPurchased: {
-        type: Sequelize.BOOLEAN
-    }
-}, {
-
-});
-
-const Feedback = sequelize.define('Feedback', {
-    name: {
-        type: Sequelize.STRING
-    },
-    email: {
-        type: Sequelize.STRING
-    },
-    message: {
-        type: Sequelize.STRING
-    }
-}, {
-
-});
-
-const ProductList = sequelize.define('ProductList', {
-    productCount: {
-        type: Sequelize.INTEGER
-    }
-}, {
-
-});
 
 User.hasMany(Cart);
 Cart.belongsTo(User);
@@ -149,13 +63,13 @@ async function getUserByCookies(cookies: any)
 
 async function getCartByCookies(cookies: any) 
 {
-    var user = await User.findOne({where: {cookie: cookies["login"]}});
+    let user = await User.findOne({where: {cookie: cookies["login"]}});
     return await Cart.findOne({where: {userId: user.id}});
 }
 
 async function getCartByUser(user :any) 
 {
-    var cart = await Cart.findOne({where: {UserId: user.id, isPurchased: false}});
+    let cart = await Cart.findOne({where: {UserId: user.id, isPurchased: false}});
     if (cart == undefined)
     {
         cart = await Cart.create({UserId: user.id, productCount: 0, isPurchased: false}, {where: {userId: user.id}});
@@ -165,28 +79,30 @@ async function getCartByUser(user :any)
 }
 
 http.createServer(async function (request: any, response: any) {
-    var filePath = './views' + request.url;
+    let productList;
+    let user;
+    let cart;
+    let filePath = './views' + request.url;
     if (request.url == "/")
     {
         filePath += "index";
     }
     filePath += ".html";
-    var url = require('url').parse(request.url, true);
+    let url = require('url').parse(request.url, true);
     console.log('request ', url.pathname);
     let cookies = parseCookies( request.headers.cookie );
     if (request.method == "GET")
     {
-        var data;
+        let data;
         if (url.pathname == "/" || url.pathname == "/index")
         {
             try {
-                var productlist = await Product.findAll({limit: 3})
                 let user = await getUserByCookies(cookies);
                 let products = await Product.findAll({limit: 3});
                 let cartCount = 0;
                 if (user != null)
                 {
-                    var cart = await getCartByUser(user);
+                    cart = await getCartByUser(user);
                     cartCount = cart.productCount;
                 }
                 data = {products: products, cart: cartCount};
@@ -201,18 +117,18 @@ http.createServer(async function (request: any, response: any) {
             let user = await getUserByCookies(cookies);
             if (user != null)
             {
-                const products = await Product.findAll({limit: 3});
-                var cart = await getCartByUser(user);
-                data = {products: products, cart: cart.productCount};
+                productList = await Product.findAll({limit: 3});
+                cart = await getCartByUser(user);
+                data = {products: productList, cart: cart.productCount};
                 redirectTo(response, "/index");
                 return;
             }
-            data = {products: products, cart: 0, isLogin: true};
+            data = {products: productList, cart: 0, isLogin: true};
         }
         else if (url.pathname == "/registration")
         {
             filePath = "views/login.html";
-            data = {products: products, cart: 0, isLogin: false};
+            data = {products: productList, cart: 0, isLogin: false};
         }
         else if (url.pathname == "/products"){
             try {
@@ -236,9 +152,9 @@ http.createServer(async function (request: any, response: any) {
             try {
                 let user = await getUserByCookies(cookies);
                 if (user != undefined) {
-                    var cart = await getCartByUser(user);
-                    var products = await ProductList.findAll({where: {CartId: cart.id}, include: Product});
-                    var total = 0;
+                    cart = await getCartByUser(user);
+                    let products = await ProductList.findAll({where: {CartId: cart.id}, include: Product});
+                    let total = 0;
                     products.forEach(function (product :any)
                     {
                         total = total + product.Product.price * product.productCount;
@@ -258,7 +174,7 @@ http.createServer(async function (request: any, response: any) {
         }
         //console.log("filepath = " + filePath);
         //console.log("data: " + JSON.stringify(data));
-        var html;
+        let html;
         if (data == undefined) {
             ejs.renderFile("views/404.html", {empty: 0}, function(error :any, content :any){
                 html = content;
@@ -295,11 +211,11 @@ http.createServer(async function (request: any, response: any) {
         {
             let data = await readRequestData(request);
             try {
-                var user = await getUserByCookies(cookies);
+                user = await getUserByCookies(cookies);
                 if (user != undefined)
                 {
-                    var cart = await getCartByUser(user);
-                    var productList = await ProductList.findOne({where: {CartId: cart.id, ProductId: data.productId}, include: Product});
+                    cart = await getCartByUser(user);
+                    productList = await ProductList.findOne({where: {CartId: cart.id, ProductId: data.productId}, include: Product});
                     if (productList.Product.inStock - 1 >= productList.productCount)
                     {
                         await ProductList.update({productCount: productList.productCount + 1}, {where: {CartId: cart.id, ProductId: data.productId}});  
@@ -324,11 +240,11 @@ http.createServer(async function (request: any, response: any) {
         {
             let data = await readRequestData(request);
             try {
-                var user = await User.findOne({where: {cookie: cookies["login"]}});
+                user = await User.findOne({where: {cookie: cookies["login"]}});
                 if (user != undefined)
                 {
-                    var cart = await Cart.findOne({where: {UserId: user.id}})
-                    var productList = await ProductList.findOne({where: {CartId: cart.id, ProductId: data.productId}});
+                    cart = await Cart.findOne({where: {UserId: user.id}});
+                    productList = await ProductList.findOne({where: {CartId: cart.id, ProductId: data.productId}});
                     if (productList.productCount > 0)
                     {
                         if (productList.productCount == 1){
@@ -358,11 +274,11 @@ http.createServer(async function (request: any, response: any) {
         {
             let data = await readRequestData(request);
             try {
-                var user = await getUserByCookies(cookies);
+                user = await getUserByCookies(cookies);
                 if (user != undefined)
                 {
-                    var cart = await getCartByUser(user);
-                    var productList = await ProductList.findOne({where: {CartId: cart.id, ProductId: data.productId}});
+                    cart = await getCartByUser(user);
+                    productList = await ProductList.findOne({where: {CartId: cart.id, ProductId: data.productId}});
                     await ProductList.destroy({where: {CartId: cart.id, ProductId: data.productId}});  
                     await Cart.update({productCount: cart.productCount - productList.productCount},{where: {id: cart.id}})    
                     response.writeHead(200);
@@ -380,11 +296,11 @@ http.createServer(async function (request: any, response: any) {
         {
             let data = await readRequestData(request);
             try {
-                var user = await getUserByCookies(cookies);    
+                user = await getUserByCookies(cookies);    
                 if (user != undefined)
                 {
-                    var cart = await getCartByUser(user);
-                    var productList = await ProductList.findOne({where: {CartId: cart.id, ProductId: data.productId}})
+                    cart = await getCartByUser(user);
+                    productList = await ProductList.findOne({where: {CartId: cart.id, ProductId: data.productId}});
                     if (productList != null)
                     {
                         await ProductList.update({productCount: productList.productCount + 1}, {where: { id: productList.id}});
@@ -393,8 +309,12 @@ http.createServer(async function (request: any, response: any) {
                     }
                     else
                     {
-                        var productlist = await ProductList.create({ProductId: data.productId, productCount: 1, CartId: cart.id});
-                        await Cart.update({ProductListId: productlist.id, productCount: cart.productCount + 1}, {where: {UserId: user.id}});
+                        productList = await ProductList.create({
+                            ProductId: data.productId,
+                            productCount: 1,
+                            CartId: cart.id
+                        });
+                        await Cart.update({ProductListId: productList.id, productCount: cart.productCount + 1}, {where: {UserId: user.id}});
                         response.writeHead(200);
                     }       
                     console.log("cart updated");         
@@ -430,10 +350,10 @@ http.createServer(async function (request: any, response: any) {
                     user = await User.findOne({where: {email: data.email, password: data.password}});
                     if (user != null)
                     {
-                        var date = new Date();
-                        var cookieTimeout = 1000;
+                        let date = new Date();
+                        const cookieTimeout = 1000;
                         date = new Date(date.getTime() + cookieTimeout * 1000);
-                        var hash = sha1(user.name + Date.now().toString() + user.password);
+                        let hash = sha1(user.name + Date.now().toString() + user.password);
                         await User.update({cookie: hash, cookieExpire:  date}, {where: {email: data.email.toString(), password: data.password.toString()}});
                         response. setHeader('Set-Cookie','login=' + hash +'; Max-Age=' + cookieTimeout +'; HttpOnly, Secure');
                         response.writeHead(301, {Location: '/index'} );
