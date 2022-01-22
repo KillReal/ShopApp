@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('partials/head.html'); %>
+
+<body>
+    <div id="home">
+        <div class="header-blue" style="padding-bottom: 40px;min-height: 700px;">
+            
+            <%- include('partials/navbar.html'); %>
+            
+            <h1 style="text-align: center;color: rgb(255,255,255);">Корзина продуктов</h1>
+            <section class="h-100" style="background-color: #eee; min-width: 300px">
+                <div class="cartlist">
+                  <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div class="col-10" style="margin-top: 50px; margin-bottom: 50px; width: 100%; min-width: 240px; padding: 0px"> 
+                        <% productlists.forEach(function(productlist) { %>
+                            <div class="card mb-4" id="card-<%= productlist.Product.id%>">
+                            <div class="card-body p-4">
+                            <div class="row d-flex justify-content-between align-items-center">
+                                <div class="col-md-2 col-lg-2 col-xl-2" style="display: flex; justify-content: space-around">
+                                <img src="<%=productlist.Product.imgUrl%>"
+                                    class="img-fluid rounded-3" alt="Cotton T-shirt">
+                                </div>
+                                <div class="col-md-3 col-lg-3 col-xl-3">
+                                <p class="lead fw-normal mb-2" style="color: black;"><%=productlist.Product.name%></p>
+                                <p style="color: darkslategrey;"><span class="text-muted">Описание: </span><%=productlist.Product.description%></p>
+                                </div>
+                                <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
+                                <button class="btn btn-link px-2"
+                                    onclick="actionWithCart('delItem', '<%=productlist.Product.id%>')">
+                                    <i class="fa fa-minus"></i>
+                                </button>
+                                <input id="form1" min="0" name="quantity" value="<%=productlist.productCount%>" type="number"
+                                    class="form-control form-control-sm" readonly style="border-radius: 12px;"/>   
+                                <button class="btn btn-link px-2"
+                                    onclick="actionWithCart('addItem', '<%=productlist.Product.id%>')">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                                </div>
+                                <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
+                                <h5 class="mb-0" style="display: flex; justify-content: space-around; padding-top: 15px; padding-bottom: 15px"><%=productlist.Product.price%>₽.</h5>
+                                </div>
+                                <div class="col-md-1 col-lg-1 col-xl-1 text-end" style="display: flex; justify-content: space-around">
+                                <a onclick="actionWithCart('removeItem', '<%=productlist.Product.id%>')" class="text-danger"><i class="delete-btn fa fa-trash fa-lg" style="cursor: pointer;"></i></a>
+                                </div>
+                            </div>
+                            </div>
+                            </div>
+                        <% })%>
+              
+                      <div class="card mb-4">
+                        <div class="card-body p-4 d-flex flex-row" style="flex-wrap: wrap;justify-content: space-around;align-items: center;">
+                          <div class="form-outline flex-fill" style="display: flex;min-width: 190px;flex-wrap: nowrap;justify-content: space-around;flex-direction: row;align-items: center;">
+                            <label class="form-label" for="form1" style="min-width: 90px;">Промо-код</label>
+                            <input type="text" id="form1" class="form-control form-control-lg" />
+                          </div>
+                          <button type="button" class="btn btn-outline-warning btn-lg ms-3" style="margin: 1rem">Применить</button>
+                        </div>
+                      </div>
+              
+                      <div class="card">
+                        <div class="card-body" style="display: flex">
+                          <button type="button" class="btn btn-warning btn-block btn-lg">Оплатить</button>
+                          <p class="product-price" style="color: black; font-size: larger; margin: 15px">Всего: <%=totalprice%>₽.</p>
+                        </div>
+                      </div>
+              
+                    </div>
+                  </div>
+                </div>
+              </section>
+        </div>
+
+        <%- include('partials/footer.html'); %>
+
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bs-init.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="assets/js/product-list.js"></script>
+    <script src="assets/js/cart.js"></script>
+</body>
+
+</html>

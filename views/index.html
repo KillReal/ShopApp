@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('partials/head.html'); %>
+
+<body>
+    <div id="home">
+        <div class="header-blue" style="padding-bottom: 0px;">
+            
+            <%- include('partials/navbar.html'); %>
+            
+            <h1 style="text-align: center;color: rgb(255,255,255);">Наши горячие предложения</h1>
+            
+            <%- include('partials/productlist.html'); %>
+            <%- include('partials/popup.html'); %>
+            
+            <div class="container">
+                <div class="row" style="margin-bottom: 40px;">
+                    <div class="col-md-6">
+                        <section class="contact-clean" style="background: rgba(241,247,252,0);padding-top: 20px;">
+                            <form class="flex-fill" method="post" id="feedbackform" style="border-radius: 12px;max-width: 700px;margin-right: 0px;margin-left: 0px;width: auto;">
+                                <h2 class="text-center" style="color: rgb(0,0,0);font-size: 25px;">Мы всегда открыты для пожеланий и предложений</h2>
+                                <div class="mb-3"><input class="form-control" type="text" name="name" placeholder="Ваше имя"></div>
+                                <div class="mb-3"><input class="form-control is-invalid" type="email" name="email" placeholder="Ваш E-mail"><small class="form-text text-danger">Пожалуйста, введите корректный адрес e-mail для обратной связи</small></div>
+                                <div class="mb-3"><textarea class="form-control" name="message" placeholder="Ваше сообщение" rows="14" style="max-height: 200px;"></textarea></div>
+                                <div class="mb-3"><button class="btn btn-primary" type="submit">Отправить</button></div>
+                                <div class="alert alert-danger d-flex flex-row visually-hidden visible" role="alert" data-aos="fade" id="feedbackfail"><span><strong>Введите корректный email</strong>!</span>
+                                    <i class="fa fa-close d-xl-flex justify-content-xl-end align-items-xl-start" id="feedbackfailclose" style="width: 20px;height: 20px;"></i></div>
+                            </form>
+                        </section>
+                    </div>
+                    <div class="col-md-6 flex-fill">
+                        <section class="flex-fill map-clean" style="margin-top: 20px;border-radius: 12px;">
+                            <div class="container">
+                                <div class="intro">
+                                    <h2 class="text-center">Наше местоположение</h2>
+                                    <p class="text-center">Работаем Понедельник-Субботу с 9:00 до 17:00</p>
+                                </div>
+                            </div><iframe class="flex-fill m-auto" allowfullscreen="" frameborder="0" src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDJz6_KM5y2685JTNNm0DRpI75ZGGI2PRo&amp;q=%D0%9A%D0%B8%D1%80%D0%BE%D0%B2%2C+%D1%83%D0%BB.+%D0%9C%D0%BE%D1%81%D0%BA%D0%BE%D0%B2%D1%81%D0%BA%D0%B0%2C+15&amp;zoom=15" width="100%" height="450" style="margin-left: 100px;background: rgba(255,255,255,0);padding-left: 20px;padding-right: 20px;padding-bottom: 20px;"></iframe>
+                        </section>
+                    </div>
+                </div>
+            </div>
+            <%- include('partials/footer.html'); %>
+        </div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bs-init.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/liSbs/aos/2.3.4/aos.js"></script>
+    <script src="assets/js/cart.js"></script>
+</body>
+
+</html>

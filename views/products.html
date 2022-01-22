@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('partials/head.html'); %>
+
+<body>
+    <div id="home">
+        <div class="header-blue" style="padding-bottom: 40px;">
+            
+            <%- include('partials/navbar.html'); %>
+            
+            <h1 style="text-align: center;color: rgb(255,255,255);">Каталог продуктов</h1>
+            
+            <%- include('partials/productlist.html'); %>
+
+            <%- include('partials/popup.html')%>
+            
+        </div>
+    </div>
+    
+    <%- include('partials/footer.html'); %>
+
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bs-init.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="assets/js/cart.js"></script>
+</body>
+
+</html>

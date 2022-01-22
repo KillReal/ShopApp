@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('partials/head.html'); %>
+
+<body>
+    <div id="home">
+        <div class="header-blue" style="padding-bottom: 0px;">
+            
+            <%- include('partials/navbar.html'); %>
+            
+            <section class="login-dark" style="height: 700px;">
+                <form class="d-xl-flex flex-column justify-content-start justify-content-xl-start" id="loginform" method="post" style="background: rgb(255,255,255);border-radius: 12px;padding-top: 20px;padding-bottom: 20px;" title="Tooltips">
+                    <h2 class="visually-hidden">Login FormGTthrhrt</h2>
+                    <div></div>
+                    <h1 style="text-align: center;color: rgb(0, 0, 0);">
+                       <%if (isLogin == true) {%>
+                        Авторизация
+                        <%} else {%>
+                        Регистрация       
+                        <%}%>
+                    </h1>
+                    <div class="mb-3">
+                        <input class="form-control" type="email" name="email" placeholder="Ваш E-mail" style="color: rgb(0,0,0);">
+                    </div>
+                    <div class="mb-3"><input class="form-control" type="password" name="password" placeholder="Пароль" style="color: rgb(0,0,0);"></div>
+                    <div class="mb-3"><button class="btn btn-primary d-block w-100" id="sendbutton" type="submit" style="margin-top: 12px;" onlick="checkloginresult" name="btnsend">
+                        <%if (isLogin == true) {%>
+                            Войти
+                            <%} else {%>
+                            Регистрация       
+                            <%}%>
+                    </button></div>
+                    <div class="alert alert-danger d-flex flex-row visually-hidden visible" role="alert" data-aos="fade" id="loginfail"><span><strong>Неверный E-mail или пароль</strong>!</span>
+                        <i class="fa fa-close d-xl-flex justify-content-xl-end align-items-xl-start" id="loginfailclose" style="width: 20px;height: 20px;"></i>
+                    </div>
+                    <%if (isLogin == true) {%>
+                        <div class="mb-3" style="display: inline-grid">
+                            <a href="/registration" class="link-primary" style="font-size: small;">Нет личного кабинета? Зарегистрируйтесь!</a>
+                        </div>
+                    <%}%>
+                </form>
+            </section>
+
+            <%- include('partials/footer.html'); %>
+
+        </div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bs-init.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="assets/js/login.js"></script>
+</body>
+
+</html>
