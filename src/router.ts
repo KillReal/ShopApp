@@ -1,12 +1,11 @@
-﻿import {Cart, Product, ProductList, getCartByUser, Feedback, User} from "./models";
-import {getUserByCookies, parseCookies} from "./tools";
+﻿import {Cart, Feedback, getCartByUser, Product, ProductList, User} from "./models";
+import {checkEmail, parseCookies, renderPage} from "./tools";
 import querystring from "querystring";
-import { encrypt, decrypt }  from "./encryption";
+import {decrypt, encrypt} from "./encryption";
+import {authentificateUser, verifyUser} from "./Authentification";
+import {HandleGetRequest as HandleAdminGetRequest, HandlePostRequest as HandleAdminPostRequest} from "./adminRouter";
 
-const ejs = require("ejs");
-const sha1 = require('sha1');
-
-function readRequestData(request: any): any
+export function readRequestData(request: any): any
 {
     return new Promise((resolve, reject) => {
         let body = '';
@@ -14,122 +13,148 @@ function readRequestData(request: any): any
             body += buffer;
         });
         request.on('end', () => {
-            resolve(querystring.decode(body));
+            let type = request.headers['content-type'];
+            if (type.split(';')[0] == "application/x-www-form-urlencoded")
+            {
+                resolve(querystring.decode(body));
+            }
+            else
+            {
+                resolve(body)
+            }
         });
     })
 }
 
-function redirectTo(response :any, url: string)
+export function redirectTo(response :any, url: string)
 {
     response.statusCode = 302;
     response.setHeader('Location', url);
     response.end();
 }
 
-export async function HandleGetRequest(request :any, response: any)
+export function getFilePath(url :any)
 {
-    let filePath = './views' + request.url;
-    if (request.url == "/")
+    let filePath = './views' + url;
+    if (url == "/")
     {
         filePath += "index";
     }
-    filePath += ".html";
-    let url = require('url').parse(request.url, true);
-    console.log('request ', url.pathname);
+    return filePath += ".html";
+}
+
+export async function HandleGetRequest(request :any, response: any)
+{
     let cookies = parseCookies( request.headers.cookie );
-    let data, productList;
-    if (url.pathname == "/" || url.pathname == "/index") {
-        try {
-            let user = await getUserByCookies(cookies);
-            let products = await Product.findAll({limit: 3});
-            let cartCount = 0;
-            if (user != null) {
-                let cart = await getCartByUser(user);
-                cartCount = cart.productCount;
-            }
-            data = {products: products, cart: cartCount};
-        } catch (error) {
-            console.log("Failed to load products (" + error + ")");
-        }
-    } else if (url.pathname == "/login") {
-        data = {empty: 0};
-        let user = await getUserByCookies(cookies);
-        if (user != null) {
-            productList = await Product.findAll({limit: 3});
-            let cart = await getCartByUser(user);
-            data = {products: productList, cart: cart.productCount};
-            redirectTo(response, "/index");
-            return;
-        }
-        data = {products: productList, cart: 0, isLogin: true};
-    } else if (url.pathname == "/registration") {
-        filePath = "views/login.html";
-        data = {products: productList, cart: 0, isLogin: false};
-    } else if (url.pathname == "/products") {
-        try {
-            await Product.findAll().then(async function (productlist: any) {
-                let user = await getUserByCookies(cookies)
-                let cartCount = 0;
+    let url = require('url').parse(request.url, true);
+    console.log('GET ', url.pathname);
+    let user = await verifyUser(cookies)
+    if (/^\/admin.*/.test(url.pathname))
+    {
+        await HandleAdminGetRequest(request, response, user);
+        return;
+    }
+    let filePath = getFilePath(request.url);
+    let data, productList, cartCount;
+    data = {empty: 0};
+    cartCount = 0;
+    let errorMessage;
+    try {
+        switch (url.pathname) {
+            case "/":
+            case "/index":
+                errorMessage = "Failed to load products";
+                let products = await Product.findAll({limit: 3});
+                if (user != null) {
+                    let cart = await getCartByUser(user);
+                    cartCount = cart.productCount;
+                }
+                data = {products: products, cart: cartCount};
+                break;
+            case "/login":
+                if (user != null) {
+                    productList = await Product.findAll({limit: 3});
+                    let cart = await getCartByUser(user);
+                    data = {products: productList, cart: cart.productCount};
+                    redirectTo(response, "/index");
+                    return;
+                }
+                data = {products: productList, cart: 0, isLogin: true};
+                break;
+            case "/unlogin":
+                if (user != null) {
+                    await User.update({cookie: "", cookieExpire: null}, {where: {id: user.id}})
+                    console.log("User " + decrypt(user.email) + " logged off")
+                }
+                redirectTo(response, "/index")
+                break;
+            case "/registration":
+                filePath = "views/login.html";
+                data = {products: productList, cart: 0, isLogin: false};
+                break;
+            case "/products":
+                errorMessage = "Failed to load products";
+                productList = await Product.findAll()
                 if (user != undefined) {
                     let cart = await getCartByUser(user);
                     cartCount = cart.productCount;
                 }
-                data = {products: productlist, cart: cartCount};
-            });
-        } catch (error) {
-            console.log("Failed to load products (" + error + ")");
-        }
-    } else if (url.pathname == "/cart") {
-        try {
-            let user = await getUserByCookies(cookies);
-            if (user != undefined) {
-                let cart = await getCartByUser(user);
-                let products = await ProductList.findAll({where: {CartId: cart.id}, include: Product});
-                let total = 0;
-                products.forEach(function (product: any) {
-                    total = total + product.Product.price * product.productCount;
-                });
-                data = {productlists: products, totalprice: total, cart: cart.productCount};
-                filePath = "./views/cart.html"
-            } else {
-                redirectTo(response, "/login");
-                return;
-            }
-        } catch (error) {
-            console.log("Failed to load cart products (" + error + ")");
+                data = {products: productList, cart: cartCount};
+                break;
+            case "/profile":
+                errorMessage = "Failed to load profile"
+                if (user != undefined) {
+                    let cart = await getCartByUser(user);
+                    data = {cart: cart.productCount, email: decrypt(user.email), isAdmin: user.role.match("admin")};
+                    filePath = "./views/profile.html"
+                } else {
+                    redirectTo(response, "/login");
+                    return;
+                }
+                break;
+            case "/cart":
+                errorMessage = "Failed to load cart products";
+                if (user != undefined) {
+                    let cart = await getCartByUser(user);
+                    let products = await ProductList.findAll({where: {CartId: cart.id}, include: Product});
+                    let total = 0;
+                    products.forEach(function (product: any) {
+                        total = total + product.Product.price * product.productCount;
+                    });
+                    data = {productlists: products, totalprice: total, cart: cart.productCount};
+                    filePath = "./views/cart.html"
+                } else {
+                    redirectTo(response, "/login");
+                    return;
+                }
+                break;
         }
     }
-    //console.log("filepath = " + filePath);
-    //console.log("data: " + JSON.stringify(data));
-    let html;
-    if (data == undefined) {
-        ejs.renderFile("views/404.html", {empty: 0}, function (error: any, content: any) {
-            html = content;
-        });
-    } else {
-        ejs.renderFile(filePath, data, function (error: any, content: any) {
-            html = content;
-        });
+    catch (error) {
+        console.log(errorMessage + " (" + error + ")");
     }
-    response.end(html, "utf-8");
+    response.end(renderPage(filePath, data), "utf-8");
 }
 
 export async function HandlePostRequest(request :any, response: any)
 {
-    let url = require('url').parse(request.url, true);
-    console.log('request ', url.pathname);
     let cookies = parseCookies( request.headers.cookie );
+    let url = require('url').parse(request.url, true);
+    console.log('POST ', url.pathname);
+    let user = await verifyUser(cookies)
+    if (/^\/admin.*/.test(url.pathname))
+    {
+        await HandleAdminPostRequest(request, response, user);
+        return;
+    }
     let data = await readRequestData(request);
-    let user = await getUserByCookies(cookies);
     let errorMessage = "Error occured";
     try {
         switch (url.pathname)
         {
             case "/":
                 errorMessage = "Failed to send feedback";
-                const emailToValidate = 'a@a.com';
-                const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-                if (!emailRegexp.test(emailToValidate)) {
+                if (!checkEmail(data.email)) {
                     response.writeHead(403);
                     response.end("Неверный e-mail");
                 } else {
@@ -163,7 +188,7 @@ export async function HandlePostRequest(request :any, response: any)
                     }
                     else
                     {
-                        await Cart.update({isPurchased: true, Date: Date.now().toString()}, {where: {id: cart.id}})
+                        await Cart.update({isPurchased: true, date: Date.now()}, {where: {id: cart.id}})
                         await productList.forEach(async function (product: any, index: any) {
                             Product.update({inStock: product.Product.inStock - product.productCount, orderCount: product.Product.orderCount + product.productCount}, 
                                 {where: {id: product.Product.id}});
@@ -287,39 +312,21 @@ export async function HandlePostRequest(request :any, response: any)
                 break;
             case "/registration":
                 errorMessage = "Failed to registrate";
-                let emailHash = encrypt(data.email.toString());
-                let passwordHash = encrypt(data.password.toString());
-                await User.create({email: emailHash.content, password: passwordHash.content});
+                if (!checkEmail(data.email))
+                {
+                    response.writeHead(303);
+                    response.end("Неверный формат e-mail");
+                }
+                else {
+                    let emailHash = encrypt(data.email.toString());
+                    let passwordHash = encrypt(data.password.toString());
+                    await User.create({email: emailHash.content, password: passwordHash.content});
+                    redirectTo(response, '/login');
+                }
                 break;
             case "/login":
                 errorMessage = "Failed to authentificate";
-                if (user != undefined) {
-                    redirectTo(response, "/index");
-                } else {
-                    let emailHash = encrypt(data.email.toString());
-                    let passwordHash = encrypt(data.password.toString());
-                    user = await User.findOne({where: {email: emailHash.content, password: passwordHash.content}});
-                    if (user != null) {
-                        let date = new Date();
-                        const cookieTimeout = 1000;
-                        date = new Date(date.getTime() + cookieTimeout * 1000);
-                        let hash = sha1(user.name + Date.now().toString() + user.password);
-                        await User.update({cookie: hash, cookieExpire: date}, {
-                            where: {
-                                email: emailHash.content,
-                                password: passwordHash.content
-                            }
-                        });
-                        response.setHeader('Set-Cookie', 'login=' + hash + '; Max-Age=' + cookieTimeout + '; HttpOnly, Secure');
-                        response.writeHead(301, {Location: '/index'});
-                        response.end("Success");
-                        console.log("User logged in successfully (" + user.name + ")");
-                    } else {
-                        response.writeHead(377);
-                        response.end("login fail");
-                        console.log("User login fail  (" + data.email.toString() + ")");
-                    }
-                }
+                await authentificateUser(user, response, data);
                 break;
         }
     }

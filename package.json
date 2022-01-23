@@ -49,6 +49,8 @@
     "eslint-plugin-jest": "^24.1.0",
     "jest": "^26.5.3",
     "mime-types": "^2.1.34",
+    "parse-multipart": "^1.0.4",
+    "parse-multipart-data": "^1.2.1",
     "pg": "^8.7.1",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.9.0",

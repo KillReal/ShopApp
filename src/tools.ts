@@ -1,4 +1,6 @@
-﻿import {Cart, User} from "./models";
+﻿import * as fs from "fs";
+
+const ejs = require("ejs");
 
 export function parseCookies(str :any)
 {
@@ -9,17 +11,46 @@ export function parseCookies(str :any)
     return obj;
 }
 
-export async function getUserByCookies(cookies: any)
-{
-    if (cookies["login"] != undefined )
-    {
-        return await User.findOne({where: {cookie: cookies["login"]}})
-    }
-    return null;
+export function saveImage(filename :string, data: any){
+    data = data.replace(/^data:image\/\w+;base64,/, "");
+    let buffer = Buffer.from(data, 'base64');
+    fs.writeFile(filename, buffer, function(err) {
+        if(err) {
+            console.log("Error while writing file: " + err);
+        } else {
+            console.log("The file " + filename + " saved");
+        }
+    });
 }
 
-export async function getCartByCookies(cookies: any)
+export function removeImage(filename :string)
 {
-    let user = await User.findOne({where: {cookie: cookies["login"]}});
-    return await Cart.findOne({where: {userId: user.id}});
+    fs.unlink(filename, function(err) {
+        if(err) {
+            console.log("Error while removing file: " + err);
+        } else {
+            console.log("The file " + filename + " removed");
+        }
+    });
+}
+
+export function renderPage(path :any, data :any)
+{
+    let html;
+    if (data == undefined) {
+        ejs.renderFile("views/404.html", {empty: 0}, function (error: any, content: any) {
+            html = content;
+        });
+    } else {
+        ejs.renderFile(path, data, function (error: any, content: any) {
+            html = content;
+        });
+    }
+    return html;
+}
+
+export function checkEmail(email :string)
+{
+    const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    return emailRegexp.test(email);
 }

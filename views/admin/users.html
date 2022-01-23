@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('partials/head.html'); %>
+
+<body>
+    <div id="home">
+            
+            <%- include('partials/navbar.html'); %>
+            
+            <h1 style="text-align: center;color: rgb(255,255,255);">Список пользователей - ADMIN</h1>
+
+            <div class="card visually-hidden">
+                <div class="modal fade" id="exampleModal" role="dialog" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 id="userId" class="modal-title">Редактирование пользователя ID: </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-start">
+                                <form id="modalForm" accept-charset="utf-8" method="POST" action="/admin/users/edit">
+                                    <input id="userIdPost" type="text" name="id" class="form-control visually-hidden">
+                                    <div class="mb-3">
+                                        <label class="form-label">E-mail</label>
+                                        <input id="userEmail" type="text" name="email" placeholder="E-mail" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Пароль</label>
+                                        <input id="userPassword" type="text" name="password" placeholder="Пароль" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Роль</label>
+                                        <input id="userRole" type="text" name="role" placeholder="Роль" class="form-control">
+                                    </div>
+                                    <div class="mb-3 d-flex justify-content-center">
+                                        <button type="submit" class="btn btn-primary">Изменить</button>
+                                        <button type="button" class="btn btn-secondary" style="margin-left: 1rem" data-bs-dismiss="modal">Закрыть</button>
+                                    </div>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card" style="margin-left: 1.5rem; margin-right: 1.5rem;">
+                <div class="card-body">
+                    <p class="card-title"></p>
+                    <button type="button" onclick="adminCreateUser()" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#exampleModal" style="margin-left: 1rem">Добавить</button>
+                    <table class="table table-hover" id="dataTables-example" width="100%">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>E-mail</th>
+                            <th>Пароль</th>
+                            <th>Cookie</th>
+                            <th>Роль</th>
+                            <th>Редактировать</th>
+                            <th>Удалить</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <% users.forEach(function(user) { %>
+                            <tr>
+                                <td id="userId-<%=user.id %>"><%=user.id %></td>
+                                <td id="userEmail-<%=user.id %>"><%=user.email %></td>
+                                <td id="userPassword-<%=user.id %>"><%=user.password %></td>
+                                <td id="userCookie-<%=user.id %>"><%=user.cookie %></td>
+                                <td id="userRole-<%=user.id %>"><%=user.role %></td>
+                                <td>
+                                    <button type="button" onclick="adminEditUser('<%=user.id %>')" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-warning btn-block btn-sm">Изменить</button>
+                                </td>
+                                <td>
+                                    <form action="/admin/users/del" method="POST">
+                                        <input type="text" name="id" value="<%=user.id%>" class="form-control visually-hidden">
+                                        <button type="submit" class="btn btn-danger btn-block btn-sm">Удалить</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% })%>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <%- include('../partials/popup.html')%>
+            
+        </div>
+    </div>
+    
+    <%- include('../partials/footer.html'); %>
+
+    <script src="../assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../assets/js/bs-init.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="../assets/js/cart.js"></script>
+    <script src="../assets/js/admin.js"></script>
+</body>
+
+</html>
