@@ -1,39 +1,116 @@
-function actionWithCart(actionType, productId){
-    switch(actionType)
-    {
-        case 'createItem': 
-            var counter = document.getElementById('cartcounter');
-            counter.innerText = parseInt(counter.innerText) + 1;
-            var popup = document.getElementById('popup');
-            popup.classList.remove('hide');
-            popup.classList.add('show');
-            popup.classList.add('didLoad');
-            setTimeout(hidePopup, 3000);
-            sendRequest('/addInCart', productId, 'Need to login', '/login'); 
-            break;
-        case 'addItem': sendRequest('/plusToCart', productId); break;
-        case 'removeItem': sendRequest('/deleteFromCart', productId); break;
-        case 'delItem': sendRequest('/minusFromCart', productId); break;
-    }
-}
-
 function hidePopup(){
-    var popup = document.getElementById('popup');
+    let popup = document.getElementById('popup');
     popup.classList.remove('show');
     popup.classList.add('hide');
 }
 
-function sendRequest(route, productId, redirectMsg = '', redirectRoute = '')
+function popupShowMessage(message)
 {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', route, true);
-    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhr.onload = function () {
-        if (redirectMsg != '' && this.responseText == redirectMsg)
-        {
-            window.location.href = redirectRoute;
-        }
-        window.location.reload();
+    if (message == null)
+    {
+        return;
+    }
+    try {
+        let popup = document.getElementById('popup');
+        popup.querySelector('.toast-body').innerText = message + "!";
+        popup.classList.remove('hide');
+        popup.classList.add('show');
+        setTimeout(hidePopup, 5000);
+    }
+    catch (e) {
+        
+    }
+}
+
+async function orderCart()
+{
+    popupShowMessage(await sendRequest('/order'));
+}
+
+function UpdateCartCounter(value)
+{
+    let counter = document.getElementById('cartcounter');
+    counter.innerText = parseInt(counter.innerText) + value;
+}
+
+function UpdateCart(productId, value)
+{
+    let card = document.getElementById('card-' + productId)
+    let count = card.querySelector('input[name="count"]')
+    let price = card.querySelector('.mb-0')
+    let totalprice = document.getElementById('totalprice')
+    totalprice.innerText = "Всего: " + (parseInt(totalprice.innerText.slice(7, -1)) +
+        parseInt(price.innerHTML.slice(0, -1)) * value) + "₽";
+    count.value = parseInt(count.value) + value;
+    if (count.value === "0")
+    {
+        card.remove();
+    }
+}
+
+async function actionWithCart(actionType, productId){
+    let result;
+    switch(actionType)
+    {
+        case 'createItem':
+            result = await sendRequest('/addInCart', productId);
+            popupShowMessage(result)
+            if (result === 'Товар добавлен в корзину')
+            {
+                UpdateCartCounter(1)
+            }
+            break;
+        case 'addItem':
+            result = await sendRequest('/plusToCart', productId);
+            popupShowMessage(result);
+            if (result === 'Товар добавлен в корзину')
+            {
+                UpdateCartCounter(1)
+                UpdateCart(productId, 1)
+            } 
+            break;
+        case 'removeItem':
+            result = await sendRequest('/deleteFromCart', productId);
+            popupShowMessage(result);
+            if (result === 'Товар убран из корзины')
+            {
+                let card = document.getElementById('card-' + productId)
+                let count = card.querySelector('input[name="count"]')
+                UpdateCartCounter(-1 * parseInt(count.value))
+                UpdateCart(productId, -1 * parseInt(count.value))   
+                card.remove();
+            }
+            break;
+        case 'delItem':
+            result = await sendRequest('/minusFromCart', productId);
+            popupShowMessage(result);
+            if (result === 'Товар убран из корзины')
+            {
+                UpdateCartCounter(-1)
+                UpdateCart(productId, -1)
+            }
+            break;
+    }
+}
+
+async function sendRequest(route, productId = -1, redirectMsg = '', redirectRoute = '')
+{
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            'productId': productId
+        })
     };
-    xhr.send('productId=' + productId);
+    let response = await fetch(route, requestOptions)
+    if (response.status != 200)
+    {
+        let message = await response.text();
+        console.log(message)
+        return message;
+    }
+    else
+    {
+        return null;
+    }
 }

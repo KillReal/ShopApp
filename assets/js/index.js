@@ -9,13 +9,13 @@ document.forms['feedbackform'].addEventListener('submit', (event) => {
         body: new URLSearchParams(new FormData(event.target)) 
     }).then((response) => {
         console.log(response);
-        if (response.status == "403")
+        if (response.status === "403")
         {
             document.getElementById("feedbackfail").classList.remove("visually-hidden");
         }
     }).then((body) => {
         console.log(body);
     }).catch((error) => {
-        // TODO handle error
+        
     });
 });

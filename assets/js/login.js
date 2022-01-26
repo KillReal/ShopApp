@@ -1,5 +1,5 @@
 document.getElementById("loginfailclose").onclick = function() {
-    document.getElementById("feedbackfailclose").classList.add("visually-hidden");
+    document.getElementById("loginfail").classList.add("visually-hidden");
 }
 
 document.forms['loginform'].addEventListener('submit', (event) => {
@@ -9,13 +9,13 @@ document.forms['loginform'].addEventListener('submit', (event) => {
         body: new URLSearchParams(new FormData(event.target)) 
     }).then((response) => {
         console.log(response);
-        if (response.status == "403")
-        {
-            document.getElementById("loginfail").classList.remove("visually-hidden");
-        }
         if (response.redirected)
         {
             window.location.href = response.url;
+        }
+        else
+        {
+            document.getElementById("loginfail").classList.remove("visually-hidden");
         }
     }).then((body) => {
         console.log(body);

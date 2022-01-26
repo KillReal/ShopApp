@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('partials/head.html'); %>
+
+<body>
+    <div id="home">
+            <%- include('partials/navbar.html'); %>
+        
+            <div class="center-page d-flex justify-content-center">
+                <section class="h-100 d-flex justify-content-center flex-column" style="background-color: #eee; min-width: 300px; padding: 1rem">
+                    <h2 class="visually-hidden">Login FormGTthrhrt</h2>
+                    <div></div>
+                    <div class="mb-3 d-flex justify-content-center">
+                        <h1 style="text-align: center;color: rgb(0, 0, 0);"> Личный кабинет</h1>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-center">
+                        <h5 class="modal-title">Ваш e-mail: <%=email%></h5>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-center">
+                        <button type="button" onclick="location.href='/cart';" class="btn btn-primary btn-block  w-75">Корзина</button>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-center">
+                        <button type="button" onclick="location.href='/orders';" class="btn btn-primary btn-block  w-75">Заказы</button>
+                    </div>
+                    <% if (isAdmin) {%>
+                    <div class="mb-3">
+                        <h5 class="modal-title">Админ возможности</h5>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-center">
+                        <button type="button" onclick="location.href='/admin/products';" class="btn btn-primary btn-block  w-75">Каталог продуктов</button>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-center">
+                        <button type="button" onclick="location.href='/admin/orders';" class="btn btn-primary btn-block  w-75">Список заказов</button>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-center">
+                        <button type="button" onclick="location.href='/admin/users';" class="btn btn-primary btn-block  w-75">Список пользователей</button>
+                    </div>
+                    <%}%>
+                    <div class="mb-3 d-flex justify-content-center">
+                        <button type="button" onclick="location.href='/unlogin';" class="btn btn-danger btn-block  w-75">Выход</button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <%- include('partials/footer.html'); %>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bs-init.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="assets/js/login.js"></script>
+</body>
+
+</html>
