@@ -1,4 +1,5 @@
 ﻿import * as fs from "fs";
+import {respondError} from "./router";
 
 const ejs = require("ejs");
 
@@ -49,8 +50,23 @@ export function renderPage(path :any, data :any)
     return html;
 }
 
-export function checkEmail(email :string)
+export function checkEmail(response :any, email :string, message :any = "Неверный формат e-mail")
 {
     const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-    return emailRegexp.test(email);
+    if (!emailRegexp.test(email))
+    {
+        respondError(response, message);
+        return false;
+    }
+    return true;
+}
+
+export function validateValue(response: any, value :any, message :string = "Ошибка в обработке запроса")
+{
+    if (value == undefined || value == "" || value == null)
+    {
+        respondError(response, message);
+        return false;
+    }
+    return true;
 }

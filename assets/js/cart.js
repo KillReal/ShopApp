@@ -1,10 +1,6 @@
-function hidePopup(){
-    let popup = document.getElementById('popup');
-    popup.classList.remove('show');
-    popup.classList.add('hide');
-}
+var popupTimer;
 
-function popupShowMessage(message)
+function popupShowMessage(title, message)
 {
     if (message == null)
     {
@@ -12,19 +8,40 @@ function popupShowMessage(message)
     }
     try {
         let popup = document.getElementById('popup');
+        popup.querySelector('.me-auto').innerHTML = title;
         popup.querySelector('.toast-body').innerText = message + "!";
         popup.classList.remove('hide');
         popup.classList.add('show');
-        setTimeout(hidePopup, 5000);
+        clearTimeout(popupTimer);
+        popupTimer = setTimeout(hidePopup, 5000);
     }
     catch (e) {
-        
+
     }
 }
 
-async function orderCart()
-{
-    popupShowMessage(await sendRequest('/order'));
+document.forms['cartPurchase'].addEventListener('submit', (event) => {
+    event.preventDefault()
+    if (!document.forms['cartPurchase'].checkValidity()) {
+        event.stopPropagation()
+    }
+    fetch(event.target.action, {
+        method: 'POST',
+        body: new URLSearchParams(new FormData(event.target))
+    }).then(async (response) => {
+        console.log(response);
+        popupShowMessage('Корзина', await response.text())
+    }).then((body) => {
+        console.log(body);
+    }).catch((error) => {
+
+    });
+});
+
+function hidePopup(){
+    let popup = document.getElementById('popup');
+    popup.classList.remove('show');
+    popup.classList.add('hide');
 }
 
 function UpdateCartCounter(value)
@@ -54,24 +71,24 @@ async function actionWithCart(actionType, productId){
     {
         case 'createItem':
             result = await sendRequest('/addInCart', productId);
-            popupShowMessage(result)
+            popupShowMessage('Корзина', result);
             if (result === 'Товар добавлен в корзину')
             {
-                UpdateCartCounter(1)
+                UpdateCartCounter(1);
             }
             break;
         case 'addItem':
             result = await sendRequest('/plusToCart', productId);
-            popupShowMessage(result);
+            popupShowMessage('Корзина', result);
             if (result === 'Товар добавлен в корзину')
             {
-                UpdateCartCounter(1)
-                UpdateCart(productId, 1)
+                UpdateCartCounter(1);
+                UpdateCart(productId, 1);
             } 
             break;
         case 'removeItem':
             result = await sendRequest('/deleteFromCart', productId);
-            popupShowMessage(result);
+            popupShowMessage('Корзина', result);
             if (result === 'Товар убран из корзины')
             {
                 let card = document.getElementById('card-' + productId)
@@ -83,7 +100,7 @@ async function actionWithCart(actionType, productId){
             break;
         case 'delItem':
             result = await sendRequest('/minusFromCart', productId);
-            popupShowMessage(result);
+            popupShowMessage('Корзина', result);
             if (result === 'Товар убран из корзины')
             {
                 UpdateCartCounter(-1)
@@ -103,14 +120,9 @@ async function sendRequest(route, productId = -1, redirectMsg = '', redirectRout
         })
     };
     let response = await fetch(route, requestOptions)
-    if (response.status != 200)
+    if (response.redirected)
     {
-        let message = await response.text();
-        console.log(message)
-        return message;
+        window.location.href = response.url;
     }
-    else
-    {
-        return null;
-    }
+    return await response.text();
 }

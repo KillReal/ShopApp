@@ -4,7 +4,7 @@
 <%- include('partials/head.html'); %>
 
 <body>
-    <div id="home">
+    <div id="home" class="home">
             <%- include('partials/navbar.html'); %>
         
             <div class="center-page d-flex justify-content-center">
@@ -24,18 +24,21 @@
                         <button type="button" onclick="location.href='/orders';" class="btn btn-primary btn-block  w-75">Заказы</button>
                     </div>
                     <% if (isAdmin) {%>
-                    <div class="mb-3">
-                        <h5 class="modal-title">Админ возможности</h5>
-                    </div>
-                    <div class="mb-3 d-flex justify-content-center">
-                        <button type="button" onclick="location.href='/admin/products';" class="btn btn-primary btn-block  w-75">Каталог продуктов</button>
-                    </div>
-                    <div class="mb-3 d-flex justify-content-center">
-                        <button type="button" onclick="location.href='/admin/orders';" class="btn btn-primary btn-block  w-75">Список заказов</button>
-                    </div>
-                    <div class="mb-3 d-flex justify-content-center">
-                        <button type="button" onclick="location.href='/admin/users';" class="btn btn-primary btn-block  w-75">Список пользователей</button>
-                    </div>
+                        <div class="mb-3">
+                            <h5 class="modal-title  d-flex justify-content-center">Админ возможности</h5>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-center">
+                            <button type="button" onclick="location.href='/admin/products';" class="btn btn-primary btn-block  w-75">Каталог продуктов</button>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-center">
+                            <button type="button" onclick="location.href='/admin/orders';" class="btn btn-primary btn-block  w-75">Список заказов</button>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-center">
+                            <button type="button" onclick="location.href='/admin/feedbacks';" class="btn btn-primary btn-block  w-75">Обращения и предложения</button>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-center">
+                            <button type="button" onclick="location.href='/admin/users';" class="btn btn-primary btn-block  w-75">Список пользователей</button>
+                        </div>
                     <%}%>
                     <div class="mb-3 d-flex justify-content-center">
                         <button type="button" onclick="location.href='/unlogin';" class="btn btn-danger btn-block  w-75">Выход</button>

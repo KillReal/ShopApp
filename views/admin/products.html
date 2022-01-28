@@ -4,66 +4,70 @@
 <%- include('partials/head.html'); %>
 
 <body>
-    <div id="home">
+    <div id="home" class="home">
             
             <%- include('partials/navbar.html'); %>
+            <%- include('../partials/popup.html');%>
             
             <h1 style="text-align: center;color: rgb(255,255,255);">Каталог продуктов - ADMIN</h1>
 
-            <div class="card visually-hidden">
-                <div class="modal fade" id="exampleModal" role="dialog" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 id="productId" class="modal-title">Редактирование продукта ID: </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body text-start">
-                                <form id="modalForm" accept-charset="utf-8" method="POST" action="/admin/products/edit">
-                                    <input id="productIdPost" type="text" name="id" class="form-control visually-hidden">
-                                    <div class="mb-3">
-                                        <label class="form-label">Название</label>
-                                        <input id="productName" type="text" name="name" placeholder="Название" class="form-control">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Описание</label>
-                                        <input id="productDescription" type="text" name="description" placeholder="Описание" class="form-control">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Цена</label>
-                                        <input id="productPrice" type="number" name="price" placeholder="Цена" class="form-control">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Цена со скидкой</label>
-                                        <input id="productDiscontPrice" type="number" name="descontPrice" placeholder="Цена со скидкой" class="form-control">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Количество в наличии</label>
-                                        <input id="productInStock" type="number" name="inStock" placeholder="Количество в наличии" class="form-control">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Картинка</label>
-                                        <div style="width: 100%; margin-bottom: 1rem">
-                                            <img id="productImage" style="max-height: 350px;" src="">
-                                        </div>
-                                        <input id="productFile" type="file" name="image" accept="image/*" placeholder="Загрузите картинку" class="form-control">
-                                        <input id="productImageBytes" type="text" name="imageBytes" class="form-control visually-hidden">
-                                    </div>
-                                    <div class="mb-3 d-flex justify-content-center">
-                                        <button type="submit" class="btn btn-primary">Изменить</button>
-                                        <button type="button" class="btn btn-secondary" style="margin-left: 1rem" data-bs-dismiss="modal">Закрыть</button>
-                                    </div>
-                            </div>
-                            </form>
-                        </div>
+        <div class="modal fade" id="exampleModal" role="dialog" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 id="productId" class="modal-title">Редактирование продукта ID: </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
+                    <div class="modal-body text-start">
+                        <form id="modalForm" method="POST" action="/admin/products/edit">
+                            <input id="productIdPost" type="text" name="id" class="form-control visually-hidden">
+                            <div class="mb-3">
+                                <label class="form-label">Название</label>
+                                <input id="productName" type="text" name="name" placeholder="Название" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Описание</label>
+                                <input id="productDescription" type="text" name="description" placeholder="Описание" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Цена</label>
+                                <input id="productPrice" type="number" min="0" name="price" placeholder="Цена" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Цена со скидкой</label>
+                                <input id="productDiscontPrice" type="number" min="0" name="discontPrice" placeholder="Цена со скидкой" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Количество в наличии</label>
+                                <input id="productInStock" type="number" min="0" name="inStock" placeholder="Количество в наличии" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Всего заказано</label>
+                                <input id="productOrderCount" type="number" min="0" name="orderCount" placeholder="Всего заказано" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Картинка</label>
+                                <div style="width: 100%; margin-bottom: 1rem">
+                                    <img id="productImage" style="max-height: 350px;" src="">
+                                </div>
+                                <input id="productFile" type="file" name="image" accept="image/*" placeholder="Загрузите картинку" class="form-control">
+                                <input id="productImageBytes" type="text" name="imageBytes" class="form-control visually-hidden">
+                            </div>
+                            <div class="mb-3 d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary">Принять</button>
+                                <button type="button" class="btn btn-secondary" style="margin-left: 1rem" data-bs-dismiss="modal">Закрыть</button>
+                            </div>
+                    </div>
+                    </form>
                 </div>
             </div>
+        </div>
             <div class="card" style="margin-left: 1.5rem; margin-right: 1.5rem;">
                 <div class="card-body">
                     <p class="card-title"></p>
-                    <button type="button" onclick="adminCreateProduct()" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#exampleModal" style="margin-left: 1rem">Добавить</button>
-                    <table class="table table-hover" id="dataTables-example" width="100%">
+                    <button type="button" onclick="adminCreateProduct()" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#exampleModal" 
+                            style="margin-left: 1rem; margin-bottom: 1rem;">Добавить</button>
+                    <table class="table table-hover" id="dataTables-example">
                         <thead>
                         <tr>
                             <th>ID</th>
@@ -80,7 +84,7 @@
                         </thead>
                         <tbody>
                         <% products.forEach(function(product) { %>
-                            <tr>
+                            <tr class="<%= product.inStock == 0 ? 'table-danger' : '' %>">
                                 <td id="productId-<%=product.id %>"><%=product.id %></td>
                                 <td>
                                     <a class="product-image" href="#"><img id="productImage-<%=product.id %>" style="max-height: 75px" src="../<%=product.imgUrl %>"></a> 
@@ -92,12 +96,13 @@
                                 <td id="productInStock-<%=product.id %>"><%=product.inStock %></td>
                                 <td id="productOrderCount-<%=product.id %>"><%=product.orderCount %></td>
                                 <td>
-                                    <button type="button" onclick="adminEditProduct('<%=product.id %>')" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-warning btn-block btn-sm">Изменить</button>
+                                    <button type="button" onclick="adminEditProduct('<%=product.id %>')" data-bs-toggle="modal" 
+                                            data-bs-target="#exampleModal" class="btn btn-warning btn-block w-100">Изменить</button>
                                 </td>
                                 <td>
                                     <form action="/admin/products/del" method="POST">
                                         <input type="text" name="id" value="<%=product.id%>" class="form-control visually-hidden">
-                                        <button type="submit" class="btn btn-danger btn-block btn-sm">Удалить</button>
+                                        <button type="submit" class="btn btn-danger btn-block w-100">Удалить</button>
                                     </form>
                                 </td>
                             </tr>
