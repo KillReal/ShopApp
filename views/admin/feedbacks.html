@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('partials/head.html'); %>
+
+<body>
+            <%- include('partials/navbar.html'); %>
+            
+            <h1 style="text-align: center;color: rgb(255,255,255);">Список предложений и обращений - ADMIN</h1>
+            <div class="card">
+                <div class="card-body table-responsive">
+                    <p class="card-title"></p>
+                    <table class="table table-hover" id="dataTables-example">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя</th>
+                            <th>E-mail</th>
+                            <th>Сообщение</th>
+                            <th>Дата сообщения</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <% feedbacks.forEach(function(feedback) { %>
+                            <tr>
+                                <td><%=feedback.UserId %></td>
+                                <td><%=feedback.name %></td>
+                                <td><%=feedback.email %></td>
+                                <td class="text-wrap" style="max-width: 30rem"><%=feedback.message %></td>
+                                <td><%=feedback.createdAt %></td>
+                            </tr>
+                        <% })%>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <%- include('../partials/footer.html'); %>
+            </div>
+            </div>
+            
+
+    <script src="../assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../assets/js/bs-init.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="../assets/js/cart.js"></script>
+    <script src="../assets/js/admin.js"></script>
+</body>
+
+</html>

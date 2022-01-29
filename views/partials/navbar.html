@@ -1,15 +1,16 @@
-<div class="header-blue" style="padding-bottom: 40px; min-height: 700px">
-<nav class="navbar navbar-dark navbar-expand-md sticker" style="padding-top:30px;">
-    <div class="container"><a class="navbar-brand" style="font-size:24px;" href="#">PhoneDialer43</a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
-        <div class="collapse navbar-collapse" id="navcol-1">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link active" href="index" target="_top">Главная</a></li>
-                <li class="nav-item"><a class="nav-link active" href="profile">Личный кабинет</a></li>
-                <li class="nav-item"><a class="nav-link active" href="products">Каталог</a></li>
-                <li class="nav-item d-flex flex-row"><a class="nav-link active" href="cart" style="width: auto;">Корзина</a>
-                    <span class="cartcount" id="cartcounter" style="display: flex; flex-wrap: nowrap; align-content: space-around ;align-items: center; background-color: cornflowerblue; min-width: 35px; justify-content: space-around; border-radius: 2rem;"><%=cart%></span>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<div id="home" class="home" style="min-height: 100vh">
+    <div class="header-blue d-flex align-items-center flex-column" id="header" style="padding-bottom: 288px;">
+        <nav class="navbar navbar-dark navbar-expand-md sticker w-100" style="padding-top:30px;">
+            <div class="container"><a class="navbar-brand" style="font-size:24px;" href="/index">PhoneDialer43</a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navcol-1">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link active" href="/index" target="_top">Главная</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="/profile">Личный кабинет</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="/products">Каталог</a></li>
+                        <li class="nav-item d-flex flex-row"><a class="nav-link active" href="cart" style="width: auto;">Корзина</a>
+                            <span class="cartcount" id="cartcounter" style="display: flex; flex-wrap: nowrap; align-content: space-around ;align-items: center; background-color: cornflowerblue; min-width: 35px; justify-content: space-around; border-radius: 2rem;"><%=cart%></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>

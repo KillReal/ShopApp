@@ -11,11 +11,14 @@ models_1.Cart.hasMany(models_1.ProductList);
 models_1.ProductList.belongsTo(models_1.Cart);
 models_1.User.hasMany(models_1.Feedback);
 models_1.Feedback.belongsTo(models_1.User);
+models_1.User.hasMany(models_1.Order);
+models_1.Order.belongsTo(models_1.Cart);
 models_1.User.sync();
 models_1.Product.sync();
 models_1.Cart.sync();
 models_1.ProductList.sync();
 models_1.Feedback.sync();
+models_1.Order.sync();
 http.createServer(async function (request, response) {
     switch (request.method) {
         case "GET":

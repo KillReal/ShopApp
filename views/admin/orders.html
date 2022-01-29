@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('partials/head.html'); %>
+
+<body>
+            
+            <%- include('partials/navbar.html'); %>
+            <%- include('../partials/popup.html');%>
+            
+            <h1 style="text-align: center;color: rgb(255,255,255);">Список заказов - ADMIN</h1>
+
+        <div class="modal fade" id="exampleModal" role="dialog" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 id="productId" class="modal-title">Редактирование заказа ID: </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-start">
+                        <form id="modalForm" method="POST" action="/admin/products/edit">
+                            <input id="orderIdPost" type="text" name="id" class="form-control visually-hidden">
+                            <div class="mb-3">
+                                <label class="form-label">ФИО заказчика</label>
+                                <input id="orderName" type="text" name="name" placeholder="ФИО заказчика" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Адрес</label>
+                                <input id="orderAddress" type="text" name="address" placeholder="Адрес" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Почтовый индекс</label>
+                                <input id="orderPostCode" type="number" min="0" name="postCode" placeholder="Почтовый индекс" class="form-control">
+                            </div>
+                            <div class="mb-3 d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary">Принять</button>
+                                <button type="button" class="btn btn-secondary" style="margin-left: 1rem" data-bs-dismiss="modal">Закрыть</button>
+                            </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+            <div class="card">
+                <div class="card-body table-responsive">
+                    <p class="card-title"></p>
+                    <table class="table table-hover" id="dataTables-example">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>ФИО заказчика</th>  
+                            <th>Адрес</th>
+                            <th>Почтовый индекс</th>
+                            <th>Сумма заказа</th>
+                            <th>Дата создания</th>
+                            <th>Редактировать</th>
+                            <th>Просмотреть</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <% orders.forEach(function(order) { %>
+                            <tr>
+                                <td id="orderId-<%=order.id %>"><%=order.id %></td>
+                                <td id="orderName-<%=order.name %>"><%=order.name %></td>
+                                <td id="orderAddress-<%=order.address %>"><%=order.address %></td>
+                                <td id="orderPostCode-<%=order.postCode %>"><%=order.postCode %></td>
+                                <td id="orderTotalPrice-<%=order.totalPrice %>"><%=order.totalPrice %></td>
+                                <td id="orderCreatedAt-<%=order.createdAt %>"><%=order.createdAt %></td>
+                                <td>
+                                    <button type="button" onclick="adminEditOrder('<%=order.id %>')" data-bs-toggle="modal" 
+                                            data-bs-target="#exampleModal" class="btn btn-warning btn-block w-100">Изменить</button>
+                                </td>
+                                <td>
+                                    <form action="/order" method="GET">
+                                        <input type="text" class="form-control visually-hidden" value="<%=order.id%>" name="id">
+                                        <input type="submit" class="btn btn-warning btn-block w-100" value="Просмотреть"/>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% })%>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <%- include('../partials/popup.html')%>
+
+            <%- include('../partials/footer.html'); %>
+            </div>
+            </div>
+
+    <script src="../assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../assets/js/bs-init.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="../assets/js/cart.js"></script>
+    <script src="../assets/js/admin.js"></script>
+</body>
+
+</html>

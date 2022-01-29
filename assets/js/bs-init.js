@@ -1,3 +1,10 @@
+document.getElementById('header').setAttribute('style',
+	'padding-bottom:'+ document.getElementById('footer-body').clientHeight +'px;');
+
+window.onresize = function(event) {
+	document.getElementById('header').setAttribute('style',
+		'padding-bottom:'+ document.getElementById('footer-body').clientHeight +'px;');
+}
 
 if (window.innerWidth < 768) {
 	[].slice.call(document.querySelectorAll('[data-bss-disabled-mobile]')).forEach(function (elem) {

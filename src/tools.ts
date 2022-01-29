@@ -1,4 +1,5 @@
 ﻿import * as fs from "fs";
+import {respondError} from "./router";
 
 const ejs = require("ejs");
 
@@ -49,8 +50,34 @@ export function renderPage(path :any, data :any)
     return html;
 }
 
-export function checkEmail(email :string)
+export function strigifyDateTime(dateTimeStamp :any)
+{
+    let date = new Date(dateTimeStamp);
+    return date.getDate() +
+    "." + String(date.getMonth() + 1).padStart(2, "0") +
+    "." + String(date.getFullYear()).padStart(2, "0") +
+    " " + String(date.getHours()).padStart(2, "0") +
+    ":" + String(date.getMinutes()).padStart(2, "0") +
+    ":" + String(date.getSeconds()).padStart(2, "0");
+}
+
+export function checkEmail(response :any, email :string, message :any = "Неверный формат e-mail")
 {
     const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-    return emailRegexp.test(email);
+    if (!emailRegexp.test(email))
+    {
+        respondError(response, message);
+        return false;
+    }
+    return true;
+}
+
+export function validateValue(response: any, value :any, message :string = "Ошибка в обработке запроса", minLen = 0, maxLen = 255)
+{
+    if (value == undefined || value == "" || value == null || value.length < minLen || value.length > maxLen)
+    {
+        respondError(response, message);
+        return false;
+    }
+    return true;
 }

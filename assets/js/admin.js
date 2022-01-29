@@ -3,6 +3,48 @@
     document.getElementById(property).value = document.getElementById(property + '-' + productId).innerText
 }
 
+function popupShowMessage(title, message)
+{
+    if (message == null)
+    {
+        return;
+    }
+    try {
+        let popup = document.getElementById('popup');
+        popup.querySelector('.me-auto').innerHTML = title;
+        popup.querySelector('.toast-body').innerText = message + "!";
+        popup.classList.remove('hide');
+        popup.classList.add('show');
+        setTimeout(hidePopup, 5000);
+    }
+    catch (e) {
+
+    }
+}
+
+document.forms['modalForm'].addEventListener('submit', (event) => {
+    event.preventDefault();
+    fetch(event.target.action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(new FormData(event.target))
+    }).then((response) => {
+        if (response.redirected)
+        {
+            window.location.href = response.url;
+        }
+        else
+        {
+            response.text().then(function(message)
+            {
+                popupShowMessage('Ошибка', message);
+            })
+        }
+    }).catch((error) => {
+        // TODO handle error
+    });
+});
+
 function adminEditProduct(productId)
 {
     document.getElementById('modalForm').action = '/admin/products/edit'
@@ -13,6 +55,7 @@ function adminEditProduct(productId)
     SetModalProperty('productPrice', productId)
     SetModalProperty('productDiscontPrice', productId)
     SetModalProperty('productInStock', productId)
+    SetModalProperty('productOrderCount', productId)
     document.getElementById('productImage').src = document.getElementById('productImage-' + productId).src
     document.getElementById('productFile').src = document.getElementById('productImage-' + productId).src
 }
@@ -26,6 +69,7 @@ function adminCreateProduct()
     document.getElementById('productPrice').value = ""
     document.getElementById('productDiscontPrice').value = ""
     document.getElementById('productInStock').value = ""
+    document.getElementById('productOrderCount').value = ""
     document.getElementById('productImage').src = ""
 }
 
