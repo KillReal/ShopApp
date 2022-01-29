@@ -21,6 +21,8 @@ ProductList.sync();
 Feedback.sync();
 Order.sync();
 
+const PORT = 8125;
+
 http.createServer(async function (request: any, response: any) {
     switch (request.method)
     {
@@ -28,5 +30,5 @@ http.createServer(async function (request: any, response: any) {
         case "POST": await HandlePostRequest(request, response); break;
     }
 
-}).listen(8125);
-console.log('Server running at http://127.0.0.1:8125/');
+}).listen(PORT);
+console.log('Server running at http://127.0.0.1:' + PORT + '/');

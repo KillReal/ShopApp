@@ -14,6 +14,7 @@ export async function HandleGetRequest(request :any, response: any, user: typeof
         response.end(html, 'utf-8');
         return;
     }
+    
     let url = require('url').parse(request.url, true);
     let filePath = getFilePath(request.url);
     try {
@@ -22,13 +23,13 @@ export async function HandleGetRequest(request :any, response: any, user: typeof
             case "/admin/products":
                 data = {products: await Product.findAll({order: [
                             ['orderCount', 'DESC'],
-                            ['id', 'ASC'],],}), cart: "admin"};
+                            ['id', 'ASC'],],}), cart: "admin", email: decrypt(user.email)};
                 break;
             case "/admin/orders":
-                data = {orders: await Order.findAll({order: [['createdAt', 'DESC']]}), cart: "admin"}
+                data = {orders: await Order.findAll({order: [['createdAt', 'DESC']]}), cart: "admin", email: decrypt(user.email)}
                 break;
             case "/admin/feedbacks":
-                data = {feedbacks: await Feedback.findAll({order: [['createdAt', 'DESC']]}), cart: "admin"}
+                data = {feedbacks: await Feedback.findAll({order: [['createdAt', 'DESC']]}), cart: "admin", email: decrypt(user.email)}
                 break;
             case "/admin/users":
                 let users = await User.findAll();
@@ -36,7 +37,7 @@ export async function HandleGetRequest(request :any, response: any, user: typeof
                     user.email = decrypt(user.email.toString());
                     user.password = decrypt(user.password.toString());
                 });
-                data = {users: users, cart: "admin"};
+                data = {users: users, cart: "admin", email: decrypt(user.email)};
                 break;
         }
         response.end(renderPage(filePath, data), "utf-8");

@@ -75,6 +75,11 @@ export async function HandleGetRequest(request :any, response: any)
     let url = require('url').parse(request.url, true);
     console.log('GET ', url.pathname);
     let user = await verifyUser(cookies)
+    let userEmail = '';
+    if (user != null)
+    {
+        userEmail = decrypt(user.email);
+    }
     if (/^\/admin.*/.test(url.pathname))
     {
         await HandleAdminGetRequest(request, response, user);
@@ -99,18 +104,18 @@ export async function HandleGetRequest(request :any, response: any)
                     let cart = await getCartByUser(user);
                     cartCount = cart.productCount;
                 }
-                data = {products: products, cart: cartCount};
+                data = {products: products, cart: cartCount, email: userEmail};
                 break;
             case "/login":
                 if (user != null) 
                 {
                     productList = await Product.findAll({limit: 3});
                     let cart = await getCartByUser(user);
-                    data = {products: productList, cart: cart.productCount};
+                    data = {products: productList, cart: cart.productCount, email: userEmail};
                     redirectTo(response, "/index");
                     return;
                 }
-                data = {products: productList, cart: 0, isLogin: true};
+                data = {products: productList, cart: 0, isLogin: true, email: userEmail};
                 break;
             case "/unlogin":
                 if (user != null)
@@ -122,7 +127,7 @@ export async function HandleGetRequest(request :any, response: any)
                 break;
             case "/registration":
                 filePath = "views/login.html";
-                data = {products: productList, cart: 0, isLogin: false};
+                data = {products: productList, cart: 0, isLogin: false, email: userEmail};
                 break;
             case "/products":
                 errorMessage = "Failed to load products";
@@ -134,7 +139,7 @@ export async function HandleGetRequest(request :any, response: any)
                     let cart = await getCartByUser(user);
                     cartCount = cart.productCount;
                 }
-                data = {products: productList, cart: cartCount};
+                data = {products: productList, cart: cartCount, email: userEmail};
                 break;
             case "/profile":
                 errorMessage = "Failed to load profile"
@@ -156,7 +161,7 @@ export async function HandleGetRequest(request :any, response: any)
                     products.forEach(function (product: any) {
                         total = total + product.Product.price * product.productCount;
                     });
-                    data = {productlists: products, totalprice: total, cart: cart.productCount, isOrder: false};
+                    data = {productlists: products, totalprice: total, cart: cart.productCount, isOrder: false, email: userEmail};
                     filePath = "./views/cart.html"
                 } else {
                     redirectTo(response, "/login");
@@ -168,10 +173,10 @@ export async function HandleGetRequest(request :any, response: any)
                     let cart = await getCartByUser(user);
                     let orders = await Order.findAll({order: [['createdAt', 'DESC']], include: {model: Cart, where: {UserId: user.id}}});
                     let ordersDates: string[] = [];
-                    orders.forEach(function(order :any, iterator:number) {
+                    orders.forEach(function(order :any, iterator :number) {
                         ordersDates[iterator] = strigifyDateTime(order.createdAt);
                     })
-                    data = {orders: orders, ordersDates: ordersDates, cart: cart.productCount}
+                    data = {orders: orders, ordersDates: ordersDates, cart: cart.productCount, email: userEmail}
                     filePath = "./views/orders.html"
                 }
                 else
@@ -192,7 +197,7 @@ export async function HandleGetRequest(request :any, response: any)
                         total = total + product.Product.price * product.productCount;
                     });
                     let orderDate = strigifyDateTime(order.createdAt);
-                    data = {productlists: products, totalprice: total, cart: cart.productCount, isOrder: true, orderDate: orderDate};
+                    data = {productlists: products, totalprice: total, cart: cart.productCount, email: userEmail, isOrder: true, orderDate: orderDate};
                     filePath = "./views/cart.html"
                 }
                 else
@@ -264,7 +269,7 @@ export async function HandlePostRequest(request :any, response: any)
                         await productList.forEach(async function (product: any, index: any) {
                             Product.update({inStock: product.Product.inStock - product.productCount, orderCount: product.Product.orderCount + product.productCount}, 
                                 {where: {id: product.Product.id}});
-                            if (product.Product.discontPrice === null)
+                            if (product.Product.discontPrice == null)
                                 totalPrice += product.Product.price * product.productCount
                             else
                                 totalPrice += product.Product.discontPrice * product.productCount
@@ -272,7 +277,7 @@ export async function HandlePostRequest(request :any, response: any)
                         let nextId = await Order.max('id') + 1;
                         await Order.create({id: nextId, name: data.name, address: data.address, postCode: data.postCode, UserId: user.id, CartId: cart.id, totalPrice: totalPrice});
                         respondOk(response, "Заказ оформлен");
-                        console.log("User (" + decrypt(user.name) + ") purchased cart (ID:" + cart.id + "), order (ID:" + nextId + ")");
+                        console.log("User (" + decrypt(user.email) + ") purchased cart (ID:" + cart.id + "), order (ID:" + nextId + ")");
                     }
                 }
                 else 
@@ -367,7 +372,7 @@ export async function HandlePostRequest(request :any, response: any)
                             if (productList.Product.inStock - 1 >= productList.productCount)
                             {
                                 await ProductList.update({productCount: productList.productCount + 1}, {where: {id: productList.id}});
-                                await Cart.update({productCount: cart.productCount + 1}, {where: {UserId: user.id}})
+                                await Cart.update({productCount: cart.productCount + 1}, {where: {id: cart.id}})
                                 respondOk(response, "Товар добавлен в корзину")
                             }
                             else
@@ -383,7 +388,7 @@ export async function HandlePostRequest(request :any, response: any)
                             await Cart.update({
                                 ProductListId: productList.id,
                                 productCount: cart.productCount + 1
-                            }, {where: {UserId: user.id}});
+                            }, {where: {id: cart    .id}});
                             respondOk(response, "Товар добавлен в корзину")
                         }
                         console.log("cart updated");
@@ -437,7 +442,6 @@ export async function HandlePostRequest(request :any, response: any)
         }
     }
     catch (error) {
-        respondError(response, "Во время обработки запроса произошла ошибка")
         console.log(errorMessage + " (" + error + ")");
     }
 }
