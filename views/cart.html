@@ -4,7 +4,6 @@
 <%- include('partials/head.html'); %>
 
 <body>
-    <div id="home" class="home">
             
             <%- include('partials/navbar.html'); %>
             <%- include('partials/popup.html'); %>
@@ -14,10 +13,10 @@
             <% } else { %>
                 <h1 style="text-align: center;color: rgb(255,255,255);">Заказ от <%=orderDate%></h1>
             <% } %>
-            <section class="h-100" style="background-color: #eee; min-width: 300px">
+            <section class="h-100 container" style="background-color: #eee; min-width: 300px">
                 <div class="cartlist">
-                  <div class="row d-flex justify-content-center align-items-center h-100">
-                    <div class="col-10" style="margin-top: 50px; margin-bottom: 50px; width: 100%; min-width: 240px; padding: 0px"> 
+                  <div class="row d-flex justify-content-center align-items-center">
+                    <div class="col-10" style="width: 100%; min-width: 240px; padding: 0px"> 
                         <% productlists.forEach(function(productlist) { %>
                             <div class="card mb-4" id="card-<%= productlist.Product.id%>">
                             <div class="card-body p-4">
@@ -30,7 +29,7 @@
                                 <p class="lead fw-normal mb-2" style="color: black;"><%=productlist.Product.name%></p>
                                 <p style="color: darkslategrey;"><span class="text-muted">Описание: </span><%=productlist.Product.description%></p>
                                 </div>
-                                <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
+                                <div class="col-md-3 col-lg-3 col-xl-2 d-flex flex-row flex-wrap align-items-center justify-content-center">
                                 <% if (!isOrder) {%>
                                     <button class="btn btn-link px-2"
                                         onclick="actionWithCart('delItem', '<%=productlist.Product.id%>')">
@@ -38,13 +37,15 @@
                                     </button>
                                 <% }%>
                                     <input id="form" min="0" name="count" value="<%=productlist.productCount%>" type="number"
-                                        class="form-control form-control-sm" readonly style="border-radius: 12px;"/>   
+                                        class="form-control form-control-sm w-50" readonly style="border-radius: 12px;"/>   
                                 <% if (!isOrder) { %>    
                                     <button class="btn btn-link px-2"
                                         onclick="actionWithCart('addItem', '<%=productlist.Product.id%>')">
                                         <i class="fa fa-plus"></i>
                                     </button>
-                                <% } %>
+                                    <span class="product-in-stock mt-2 mb-2" style="<%= productlist.Product.inStock == 0 ? 'color: red; font-weight: 800' : '' %>">В наличии: <%=productlist.Product.inStock%> шт.</span>
+
+                                    <% } %>
                                 </div>
                                 <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
                                 <h5 class="mb-0" style="display: flex; justify-content: space-around; padding-top: 15px; padding-bottom: 15px"><%=productlist.Product.price%>₽</h5>
@@ -110,10 +111,12 @@
                     </div>
                   </div>
                 </div>
-              </section>
+               
+              </section> 
+            <%- include('partials/footer.html'); %>
         </div>
 
-        <%- include('partials/footer.html'); %>
+       
 
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/js/bs-init.js"></script>

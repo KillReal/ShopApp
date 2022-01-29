@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('partials/head.html'); %>
+
+<body>
+
+    <%- include('partials/navbar.html'); %>
+    
+    <h1 style="text-align: center;color: rgb(255,255,255);">Ваши заказы</h1>
+    <section class="h-100 container" style="background-color: #eee; min-width: 300px">
+        <div class="cartlist">
+            <div class="row d-flex justify-content-center align-items-center">
+                <% if (orders.length == 0) {%>
+                <p class="lead fw-normal mb-2" style="color: black;">У вас еще нет оплаченных заказов</p>
+                <% } %>
+                <div class="col-10" style="width: 100%; min-width: 240px; padding: 0px">
+                    <% orders.forEach(function(order, iterator) { %>
+                        <div class="card">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <p class="lead fw-normal mb-2" style="color: black;">Дата заказа: <%=ordersDates[iterator]%></p>
+                                    <p style="color: darkslategrey;" class="d-flex flex-column">
+                                        <span class="text-muted">Адрес: <%=order.address%> (<%=order.postCode%>)</span>
+                                        <span class="text-muted">Заказчик ФИО: <%=order.name%></span>
+                                        <span class="text-muted">Количество товара: <%=order.Cart.productCount%></span>
+                                    </p>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0" style="display: flex; justify-content: space-around; padding-top: 15px; padding-bottom: 15px">Сумма заказа: <%=order.totalPrice%>₽</h5>
+                                    <form action="/order" method="GET" class="w-50">
+                                        <input type="text" class="form-control visually-hidden" value="<%=order.id%>" name="id">
+                                        <input type="submit" class="btn btn-warning btn-block w-100" value="Просмотреть содержимое"/>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    <% })%>
+                </div>
+                <%- include('partials/footer.html'); %>
+            </div>
+        </div>
+    </section>
+
+    
+
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bs-init.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="assets/js/product-list.js"></script>
+    <script src="assets/js/cart.js"></script>
+</body>
+
+</html>

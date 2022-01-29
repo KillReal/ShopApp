@@ -4,7 +4,6 @@
 <%- include('partials/head.html'); %>
 
 <body>
-    <div id="home" class="home">
             
             <%- include('partials/navbar.html'); %>
             <%- include('../partials/popup.html');%>
@@ -62,11 +61,11 @@
                 </div>
             </div>
         </div>
-            <div class="card" style="margin-left: 1.5rem; margin-right: 1.5rem;">
-                <div class="card-body">
+            <div class="card container">
+                <div class="card-body table-responsive fixed-table-body">
                     <p class="card-title"></p>
-                    <button type="button" onclick="adminCreateProduct()" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#exampleModal" 
-                            style="margin-left: 1rem; margin-bottom: 1rem;">Добавить</button>
+                    <button type="button" onclick="adminCreateProduct()" class="btn btn-primary btn-block ml-2 mr-2" data-bs-toggle="modal" 
+                            data-bs-target="#exampleModal">Добавить</button>
                     <table class="table table-hover" id="dataTables-example">
                         <thead>
                         <tr>
@@ -112,11 +111,9 @@
                 </div>
             </div>
             <%- include('../partials/popup.html')%>
-            
-        </div>
-    </div>
-    
-    <%- include('../partials/footer.html'); %>
+            <%- include('../partials/footer.html'); %>
+            </div>
+            </div>
 
     <script src="../assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="../assets/js/bs-init.js"></script>

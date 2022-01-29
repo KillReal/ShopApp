@@ -60,6 +60,7 @@
 .header-blue .navbar .navbar-nav a.active, .header-blue .navbar .navbar-nav > .show .dropdown-item {
   background: none;
   box-shadow: none;
+  padding-right: 1rem;
 }
 
 @media (min-width: 768px) {

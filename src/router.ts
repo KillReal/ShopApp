@@ -1,10 +1,10 @@
 ﻿import {Cart, Feedback, getCartByUser, Order, Product, ProductList, User} from "./models";
-import {checkEmail, parseCookies, renderPage, validateValue} from "./tools";
+import {checkEmail, parseCookies, renderPage, strigifyDateTime, validateValue} from "./tools";
 import querystring from "querystring";
 import {decrypt, encrypt} from "./encryption";
 import {authentificateUser, verifyUser} from "./Authentification";
 import {HandleGetRequest as HandleAdminGetRequest, HandlePostRequest as HandleAdminPostRequest} from "./adminRouter";
-import {where} from "sequelize";
+import Model, {where} from "sequelize";
 
 export function readRequestData(request: any): any
 {
@@ -165,7 +165,13 @@ export async function HandleGetRequest(request :any, response: any)
                 break;
             case  "/orders":
                 if (user != undefined) {
-                    data = {orders: await Order.findAll({order: [['createdAt', 'DESC']]}, {where: {UserId: user.id}}), cart: "admin"}
+                    let cart = await getCartByUser(user);
+                    let orders = await Order.findAll({order: [['createdAt', 'DESC']], include: {model: Cart, where: {UserId: user.id}}});
+                    let ordersDates: string[] = [];
+                    orders.forEach(function(order :any, iterator:number) {
+                        ordersDates[iterator] = strigifyDateTime(order.createdAt);
+                    })
+                    data = {orders: orders, ordersDates: ordersDates, cart: cart.productCount}
                     filePath = "./views/orders.html"
                 }
                 else
@@ -185,13 +191,7 @@ export async function HandleGetRequest(request :any, response: any)
                     products.forEach(function (product: any) {
                         total = total + product.Product.price * product.productCount;
                     });
-                    let date = new Date(order.createdAt);
-                    let orderDate = date.getDate() +
-                        "." + String(date.getMonth() + 1).padStart(2, "0") +
-                        "." + String(date.getFullYear()).padStart(2, "0") +
-                        " " + String(date.getHours()).padStart(2, "0") +
-                        ":" + String(date.getMinutes()).padStart(2, "0") +
-                        ":" + String(date.getSeconds()).padStart(2, "0");
+                    let orderDate = strigifyDateTime(order.createdAt);
                     data = {productlists: products, totalprice: total, cart: cart.productCount, isOrder: true, orderDate: orderDate};
                     filePath = "./views/cart.html"
                 }
@@ -246,15 +246,15 @@ export async function HandlePostRequest(request :any, response: any)
                         }
                         totalCounts += product.productCount;
                     });
-                    if (totalCounts == 0)
-                    {
-                        respondError(response, "Нельзя оплатить пустую корзину");
-                        return;
-                    }
                     if (isFail)
                     {
                         respondError(response, "Некоторых товаров не оказалось на складе");
                         console.log("Failed to order cart (ID:" + cart.id + ")");
+                        return;
+                    }
+                    if (totalCounts == 0)
+                    {
+                        respondError(response, "Нельзя оплатить пустую корзину");
                         return;
                     }
                     else
@@ -423,9 +423,9 @@ export async function HandlePostRequest(request :any, response: any)
                 errorMessage = "Failed to save user feedback";
                 if (!checkEmail(response, data.email))
                     return;
-                if (!validateValue(response, data.name, "Поле ФИО не может быть пустым"))
+                if (!validateValue(response, data.name, "Поле ФИО не может быть пустым, либо слишком длинным"))
                     return;
-                if (!validateValue(response, data.message , "Поле сообщение не может быть пустым"))
+                if (!validateValue(response, data.message , "Поле сообщение не может быть пустым, либо слишком длинным", 0, 1024))
                     return;
                 let userId = undefined;
                 if (user != undefined)
@@ -437,6 +437,7 @@ export async function HandlePostRequest(request :any, response: any)
         }
     }
     catch (error) {
+        respondError(response, "Во время обработки запроса произошла ошибка")
         console.log(errorMessage + " (" + error + ")");
     }
 }

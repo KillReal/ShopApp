@@ -5,6 +5,7 @@
 
 .card {
     border-radius: 12px;
+    margin: 2rem;
 }
 
 i.delete-btn.fa.fa-trash.fa-lg {

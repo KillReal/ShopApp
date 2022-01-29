@@ -4,13 +4,11 @@
 <%- include('partials/head.html'); %>
 
 <body>
-    <div id="home" class="home">
-            
             <%- include('partials/navbar.html'); %>
             
             <h1 style="text-align: center;color: rgb(255,255,255);">Список предложений и обращений - ADMIN</h1>
-            <div class="card" style="margin-left: 1.5rem; margin-right: 1.5rem;">
-                <div class="card-body">
+            <div class="card">
+                <div class="card-body table-responsive">
                     <p class="card-title"></p>
                     <table class="table table-hover" id="dataTables-example">
                         <thead>
@@ -28,7 +26,7 @@
                                 <td><%=feedback.UserId %></td>
                                 <td><%=feedback.name %></td>
                                 <td><%=feedback.email %></td>
-                                <td><%=feedback.message %></td>
+                                <td class="text-wrap" style="max-width: 30rem"><%=feedback.message %></td>
                                 <td><%=feedback.createdAt %></td>
                             </tr>
                         <% })%>
@@ -36,10 +34,10 @@
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <%- include('../partials/footer.html'); %>
+            <%- include('../partials/footer.html'); %>
+            </div>
+            </div>
+            
 
     <script src="../assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="../assets/js/bs-init.js"></script>
