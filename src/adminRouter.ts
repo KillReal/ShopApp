@@ -171,7 +171,7 @@ export async function  HandlePostRequest(request :any, response: any, user: type
                 let foundUser = await User.findOne({where: {id: data.id}})
                 if (foundUser != null)
                 {
-                    User.destroy({where: {id: data.id}})
+                    await User.destroy({where: {id: data.id}})
                     console.log("Removed user (" + decrypt(foundUser.email) + ") by admin: " + decrypt(user.email))
                     redirectTo(response, '/admin/users')
                 }

@@ -19,18 +19,12 @@ export function readRequestData(request: any): any
                 {
                     let type = request.headers['content-type'];
                     if (type.split(';')[0] == "application/x-www-form-urlencoded")
-                    {
                         resolve(querystring.decode(body));
-                    }
                     else
-                    {
                         resolve(body)
-                    }
                 }
                 else
-                {
                     resolve(querystring.decode(request.url.split('?')[1]));
-                }
             }
             catch (error) {
                 console.log("Unexpected error on readRequestData (" + error + ")");
@@ -131,9 +125,7 @@ export async function HandleGetRequest(request :any, response: any)
                 break;
             case "/products":
                 errorMessage = "Failed to load products";
-                productList = await Product.findAll({order: [
-                        ['orderCount', 'DESC'],
-                        ['id', 'ASC']]})
+                productList = await Product.findAll({order: [['orderCount', 'DESC'], ['id', 'ASC']]})
                 if (user != undefined) 
                 {
                     let cart = await getCartByUser(user);
@@ -231,11 +223,11 @@ export async function HandlePostRequest(request :any, response: any)
                 errorMessage = "Failed to order";
                 let isFail = false;
                 if (user != undefined) {
-                    if (!validateValue(response, data.name, "Поле ФИО не может быть пустым"))
+                    if (!validateValue(response, data.name, "Поле ФИО не может быть пустым, либо слишком длинным"))
                         return;
-                    if (!validateValue(response, data.address, "Поле адрес не может быть пустым"))
+                    if (!validateValue(response, data.address, "Поле адрес не может быть пустым, либо слишком длинным"))
                         return;
-                    if (!validateValue(response, data.postCode, "Поле почтовый индекс не может быть пустым"))
+                    if (!validateValue(response, data.postCode, "Поле почтовый индекс не может быть пустым, либо слишком длинным"))
                         return;
                     let cart = await getCartByUser(user);
                     let productList = await ProductList.findAll({
@@ -243,7 +235,7 @@ export async function HandlePostRequest(request :any, response: any)
                         include: Product
                     });
                     let totalCounts = 0;
-                    await productList.forEach(async function (product: any, index: any) {
+                    await productList.forEach(void async function (product: any, index: any) {
                         if (product.productCount > product.Product.inStock)
                         {
                             isFail = true;
@@ -266,8 +258,8 @@ export async function HandlePostRequest(request :any, response: any)
                     {
                         await Cart.update({isPurchased: true, date: Date.now()}, {where: {id: cart.id}})
                         let totalPrice = 0;
-                        await productList.forEach(async function (product: any, index: any) {
-                            Product.update({inStock: product.Product.inStock - product.productCount, orderCount: product.Product.orderCount + product.productCount}, 
+                        await productList.forEach(void async function (product: any, index: any) {
+                            await Product.update({inStock: product.Product.inStock - product.productCount, orderCount: product.Product.orderCount + product.productCount}, 
                                 {where: {id: product.Product.id}});
                             if (product.Product.discontPrice == null)
                                 totalPrice += product.Product.price * product.productCount
