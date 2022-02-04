@@ -7,15 +7,12 @@ document.forms['loginform'].addEventListener('submit', (event) => {
     fetch(event.target.action, {
         method: 'POST',
         body: new URLSearchParams(new FormData(event.target)) 
-    }).then((response) => {
-        console.log(response);
+    }).then(async (response) => {
         if (response.redirected)
-        {
             window.location.href = response.url;
-        }
-        else
-        {
+        else {
             document.getElementById("loginfail").classList.remove("visually-hidden");
+            document.getElementById("loginfailmessage").innerText = await response.text();
         }
     }).then((body) => {
         console.log(body);

@@ -9,10 +9,8 @@ document.forms['feedbackform'].addEventListener('submit', (event) => {
         method: 'POST',
         body: new URLSearchParams(new FormData(event.target)) 
     }).then(async (response) => {
-        console.log(response);
         popupShowMessage('Форма обратной связи', await response.text())
     }).then((body) => {
-        console.log(body);
     }).catch((error) => {
         
     });

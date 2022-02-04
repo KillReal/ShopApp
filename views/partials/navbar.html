@@ -10,7 +10,7 @@
                         <li class="nav-item mt-1 mb-1">
                             <a class="nav-link active" href="/products">Каталог</a>
                         </li>
-                        <li class="nav-item d-flex flex-row mt-1 mb-1" style="<%=email == '' ? '' : 'border-radius: 20px; background: #eee4;' %>">
+                        <li class="nav-item d-flex flex-row mt-1 mb-1" style="<%=email == '' ? '' : 'border-radius: 20px; background: #eee4; margin-right: 0.5rem' %>">
                             <a class="nav-link active" href="/profile">Личный кабинет</a>
                             <% if (email != '') {%>
                                 <a class="nav-link nav-link-addition" href="/profile"><%=email%></a>

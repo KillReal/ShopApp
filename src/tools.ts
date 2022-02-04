@@ -1,20 +1,25 @@
 ﻿import * as fs from "fs";
 import {respondError} from "./router";
 
-const ejs = require("ejs");
+import ejs from 'ejs';
 
-export function parseCookies(str :any)
+export function parseCookies(str: any): any
 {
-    let rx = /([^;=\s]*)=([^;]*)/g;
-    let obj: any = { };
-    for (let m ; m = rx.exec(str) ; )
-        obj[ m[1] ] = decodeURIComponent( m[2] );
-    return obj;
+    const list: any = {};
+    str.split(`;`).forEach(function(cookie: any) {
+        let [ name, ...rest] = cookie.split(`=`);
+        name = name?.trim();
+        if (!name) return;
+        const value = rest.join(`=`).trim();
+        if (!value) return;
+        list[name] = decodeURIComponent(value);
+    });
+    return list;
 }
 
-export function saveImage(filename :string, data: any){
+export function saveImage(filename: string, data: any): void {
     data = data.replace(/^data:image\/\w+;base64,/, "");
-    let buffer = Buffer.from(data, 'base64');
+    const buffer = Buffer.from(data, 'base64');
     fs.writeFile(filename, buffer, function(err) {
         if(err) {
             console.log("Error while writing file: " + err);
@@ -24,7 +29,7 @@ export function saveImage(filename :string, data: any){
     });
 }
 
-export function removeImage(filename :string)
+export function removeImage(filename: string): void
 {
     fs.unlink(filename, function(err) {
         if(err) {
@@ -35,7 +40,7 @@ export function removeImage(filename :string)
     });
 }
 
-export function renderPage(path :any, data :any)
+export function renderPage(path: any, data: any): undefined
 {
     let html;
     if (data == undefined) {
@@ -50,10 +55,10 @@ export function renderPage(path :any, data :any)
     return html;
 }
 
-export function strigifyDateTime(dateTimeStamp :any)
+export function strigifyDateTime(dateTimeStamp: any): string
 {
-    let date = new Date(dateTimeStamp);
-    return date.getDate() +
+    const date = new Date(dateTimeStamp);
+    return String(date.getDate()).padStart(2, "0") +
     "." + String(date.getMonth() + 1).padStart(2, "0") +
     "." + String(date.getFullYear()).padStart(2, "0") +
     " " + String(date.getHours()).padStart(2, "0") +
@@ -61,7 +66,7 @@ export function strigifyDateTime(dateTimeStamp :any)
     ":" + String(date.getSeconds()).padStart(2, "0");
 }
 
-export function checkEmail(response :any, email :string, message :any = "Неверный формат e-mail")
+export function checkEmail(response: any, email: string, message: any = "Неверный формат e-mail"): boolean
 {
     const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     if (!emailRegexp.test(email))
@@ -72,7 +77,7 @@ export function checkEmail(response :any, email :string, message :any = "Нев�
     return true;
 }
 
-export function validateValue(response: any, value :any, message :string = "Ошибка в обработке запроса", minLen = 0, maxLen = 255)
+export function validateValue(response: any, value: any, message = "Ошибка в обработке запроса", minLen = 0, maxLen = 255): boolean
 {
     if (value == undefined || value == "" || value == null || value.length < minLen || value.length > maxLen)
     {

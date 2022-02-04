@@ -1,7 +1,7 @@
 import {Cart, Feedback, Product, ProductList, User, Order} from "./models";
 import {HandleGetRequest, HandlePostRequest} from "./router";
 
-const http = require('http');
+import http = require('http');
 
 User.hasMany(Cart);
 Cart.belongsTo(User);
@@ -23,7 +23,7 @@ Order.sync();
 
 const PORT = 8125;
 
-http.createServer(async function (request: any, response: any) {
+http.createServer(async function (request: any, response: any): Promise<any> {
     switch (request.method)
     {
         case "GET": await HandleGetRequest(request, response); break;

@@ -46,8 +46,8 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Картинка</label>
-                                <div style="width: 100%; margin-bottom: 1rem">
-                                    <img id="productImage" style="max-height: 350px;" src="">
+                                <div style="width: 100%; margin-bottom: 1rem;">
+                                    <img id="productImage" style="max-height: 350px;width: 100%; object-fit: contain" src="">
                                 </div>
                                 <input id="productFile" type="file" name="image" accept="image/*" placeholder="Загрузите картинку" class="form-control">
                                 <input id="productImageBytes" type="text" name="imageBytes" class="form-control visually-hidden">
@@ -86,7 +86,7 @@
                             <tr class="<%= product.inStock == 0 ? 'table-danger' : '' %>">
                                 <td id="productId-<%=product.id %>"><%=product.id %></td>
                                 <td>
-                                    <a class="product-image" href="#"><img id="productImage-<%=product.id %>" style="max-height: 75px" src="../<%=product.imgUrl %>"></a> 
+                                    <a class="product-image" href="#"><img id="productImage-<%=product.id %>" style="max-height: 75px; width: 100%; object-fit: contain" src="../<%=product.imgUrl %>"></a> 
                                 </td>
                                 <td id="productName-<%=product.id %>"><%=product.name %></td>
                                 <td id="productDescription-<%=product.id %>"><%=product.description %></td>
