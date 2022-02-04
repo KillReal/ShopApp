@@ -57,10 +57,21 @@
   background: none;
 }
 
-.header-blue .navbar .navbar-nav a.active, .header-blue .navbar .navbar-nav > .show .dropdown-item {
-  background: none;
+.nav-link-addition {
   box-shadow: none;
   padding-right: 1rem;
+  border-radius: 2rem;
+  color: white !important;
+  background: cornflowerblue;
+  max-width: 15rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-blue .navbar .navbar-nav a.active, .header-blue .navbar .navbar-nav > .show .dropdown-item {
+  box-shadow: none;
+  padding-right: 1rem;
+  background: none;
 }
 
 @media (min-width: 768px) {

@@ -6,7 +6,7 @@
 <body>
             <%- include('partials/navbar.html'); %>
             
-            <section class="login-dark" style="height: 700px;">
+            <section class="login-dark w-100" style="height: 700px;">
                 <form class="d-xl-flex flex-column justify-content-start justify-content-xl-start" id="loginform" method="post" style="background: rgb(255,255,255);border-radius: 12px;padding-top: 20px;padding-bottom: 20px;" title="Tooltips">
                     <h2 class="visually-hidden">Login FormGTthrhrt</h2>
                     <div></div>
@@ -28,7 +28,10 @@
                             Регистрация       
                             <%}%>
                     </button></div>
-                    <div class="alert alert-danger d-flex flex-row visually-hidden visible" role="alert" data-aos="fade" id="loginfail"><span><strong>Неверный E-mail или пароль</strong>!</span>
+                    <div class="alert alert-danger d-flex flex-row visually-hidden visible" role="alert" data-aos="fade" id="loginfail">
+                        <span>
+                            <strong id="loginfailmessage">Неверный E-mail или пароль</strong>!
+                        </span>
                         <i class="fa fa-close d-xl-flex justify-content-xl-end align-items-xl-start" id="loginfailclose" style="width: 20px;height: 20px;"></i>
                     </div>
                     <%if (isLogin == true) {%>

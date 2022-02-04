@@ -13,7 +13,7 @@
             <% } else { %>
                 <h1 style="text-align: center;color: rgb(255,255,255);">Заказ от <%=orderDate%></h1>
             <% } %>
-            <section class="h-100 container" style="background-color: #eee; min-width: 300px">
+            <section class="h-100 container" style="background-color: #eee; min-width: 300px; margin-top: 1rem">
                 <div class="cartlist">
                   <div class="row d-flex justify-content-center align-items-center">
                     <div class="col-10" style="width: 100%; min-width: 240px; padding: 0px"> 
@@ -48,7 +48,7 @@
                                     <% } %>
                                 </div>
                                 <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                                <h5 class="mb-0" style="display: flex; justify-content: space-around; padding-top: 15px; padding-bottom: 15px"><%=productlist.Product.price%>₽</h5>
+                                <h3 class="mb-0" style="display: flex; justify-content: space-around; padding-top: 15px; padding-bottom: 15px"><%=productlist.Product.price%>₽</h3>
                                 </div>
                                 <% if (!isOrder) {%>
                                     <div class="col-md-1 col-lg-1 col-xl-1 text-end" style="display: flex; justify-content: space-around">
@@ -61,7 +61,7 @@
                         <% })%>
               
                         <% if (!isOrder) {%>
-                          <div class="card mb-4">
+                          <div class="card mb-4 visually-hidden">
                             <div class="card-body p-4 d-flex flex-row" style="flex-wrap: wrap;justify-content: space-around;align-items: center;">
                               <div class="form-outline flex-fill" style="display: flex;min-width: 190px;flex-wrap: nowrap;justify-content: space-around;flex-direction: row;align-items: center;">
                                 <label class="form-label" for="form1" style="min-width: 90px;">Промо-код</label>
@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="card-body" style="display: flex">
                                     <button type="submit" class="btn btn-warning btn-block btn-lg">Оплатить</button>
-                                    <p class="product-price" id="totalprice" style="color: black; font-size: larger; margin: 15px">Всего: <%=totalprice%>₽</p>
+                                    <p class="product-price" id="totalprice" style="color: black; font-size: x-large; margin: 15px">Всего: <%=totalprice%>₽</p>
                                 </div>
                             </form>
                           </div>
@@ -120,8 +120,6 @@
 
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/js/bs-init.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-    <script src="assets/js/product-list.js"></script>
     <script src="assets/js/cart.js"></script>
 </body>
 

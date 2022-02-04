@@ -29,10 +29,9 @@ document.forms['cartPurchase'].addEventListener('submit', (event) => {
         method: 'POST',
         body: new URLSearchParams(new FormData(event.target))
     }).then(async (response) => {
-        console.log(response);
         popupShowMessage('Корзина', await response.text())
     }).then((body) => {
-        console.log(body);
+        
     }).catch((error) => {
 
     });
@@ -123,6 +122,7 @@ async function sendRequest(route, productId = -1, redirectMsg = '', redirectRout
     if (response.redirected)
     {
         window.location.href = response.url;
+        return null;
     }
     return await response.text();
 }

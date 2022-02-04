@@ -41,8 +41,8 @@
                 </div>
             </div>
         </div>
-            <div class="card">
-                <div class="card-body table-responsive">
+            <div class="card container">
+                <div class="card-body table-responsive fixed-table-body">
                     <p class="card-title"></p>
                     <table class="table table-hover" id="dataTables-example">
                         <thead>
@@ -53,7 +53,7 @@
                             <th>Почтовый индекс</th>
                             <th>Сумма заказа</th>
                             <th>Дата создания</th>
-                            <th>Редактировать</th>
+                            <th class="visually-hidden">Редактировать</th>
                             <th>Просмотреть</th>
                         </tr>
                         </thead>
@@ -66,7 +66,7 @@
                                 <td id="orderPostCode-<%=order.postCode %>"><%=order.postCode %></td>
                                 <td id="orderTotalPrice-<%=order.totalPrice %>"><%=order.totalPrice %></td>
                                 <td id="orderCreatedAt-<%=order.createdAt %>"><%=order.createdAt %></td>
-                                <td>
+                                <td class="visually-hidden">
                                     <button type="button" onclick="adminEditOrder('<%=order.id %>')" data-bs-toggle="modal" 
                                             data-bs-target="#exampleModal" class="btn btn-warning btn-block w-100">Изменить</button>
                                 </td>

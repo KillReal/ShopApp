@@ -6,7 +6,7 @@ window.onresize = function(event) {
 		'padding-bottom:'+ document.getElementById('footer-body').clientHeight +'px;');
 }
 
-if (window.innerWidth < 768) {
+if (window.innerWidth < 1000) {
 	[].slice.call(document.querySelectorAll('[data-bss-disabled-mobile]')).forEach(function (elem) {
 		elem.classList.remove('animated');
 		elem.removeAttribute('data-bss-hover-animate');

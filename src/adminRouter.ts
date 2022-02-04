@@ -2,41 +2,53 @@
 import {getFilePath, readRequestData, redirectTo} from "./router";
 import {removeImage, renderPage, saveImage} from "./tools";
 import {decrypt, encrypt} from "./encryption";
-import {Sequelize} from "sequelize";
 
-let errorMessage = "Error occured";
-let data :any;
+const errorMessage = "Error occured";
+let data: any;
 
-export async function HandleGetRequest(request :any, response: any, user: typeof User) {
+export async function HandleGetRequest(request: any, response: any, user: typeof User): Promise<any> {
     if (user == null || user.role != "admin")
     {
-        let html = renderPage('./view/404.html', undefined);
+        const html = renderPage('./view/404.html', undefined);
         response.end(html, 'utf-8');
         return;
     }
-    let url = require('url').parse(request.url, true);
-    let filePath = getFilePath(request.url);
+    
+    const url = require('url').parse(request.url, true);
+    const filePath = getFilePath(request.url);
     try {
         switch (url.pathname)
         {
             case "/admin/products":
                 data = {products: await Product.findAll({order: [
                             ['orderCount', 'DESC'],
-                            ['id', 'ASC'],],}), cart: "admin"};
+                            ['id', 'ASC'],],}), cart: "admin", email: decrypt(user.email)};
                 break;
             case "/admin/orders":
-                data = {orders: await Order.findAll({order: [['createdAt', 'DESC']]}), cart: "admin"}
+                const orders = await Order.findAll({order: [['createdAt', 'DESC']]});
+                orders.forEach(function (order: any) {
+                    order.name = decrypt(order.name.toString());
+                    order.address = decrypt(order.address.toString());
+                    order.postCode = decrypt(order.postCode.toString());
+                });
+                data = {orders: orders, cart: "admin", email: decrypt(user.email)}
                 break;
             case "/admin/feedbacks":
-                data = {feedbacks: await Feedback.findAll({order: [['createdAt', 'DESC']]}), cart: "admin"}
+                const feedbacks = await Feedback.findAll({order: [['createdAt', 'DESC']]});
+                feedbacks.forEach(function (feedback: any) {
+                    feedback.name = decrypt(feedback.name.toString());
+                    feedback.email = decrypt(feedback.email.toString());
+                    feedback.message = decrypt(feedback.message.toString());
+                });
+                data = {feedbacks: feedbacks, cart: "admin", email: decrypt(user.email)}
                 break;
             case "/admin/users":
-                let users = await User.findAll();
+                const users = await User.findAll();
                 users.forEach(function (user: any) {
                     user.email = decrypt(user.email.toString());
                     user.password = decrypt(user.password.toString());
                 });
-                data = {users: users, cart: "admin"};
+                data = {users: users, cart: "admin", email: decrypt(user.email)};
                 break;
         }
         response.end(renderPage(filePath, data), "utf-8");
@@ -47,28 +59,13 @@ export async function HandleGetRequest(request :any, response: any, user: typeof
     
 }
 
-function getBoundary(request :any) {
-    let contentType = request.headers['content-type']
-    const contentTypeArray = contentType.split(';').map((item: string) => item.trim())
-    const boundaryPrefix = 'boundary='
-    let boundary = contentTypeArray.find((item: string) => item.startsWith(boundaryPrefix))
-    if (!boundary) return null
-    boundary = boundary.slice(boundaryPrefix.length)
-    if (boundary) boundary = boundary.trim()
-    return boundary
-}
-
-function validateProduct(product: typeof  Product)
+function validateProduct(product: typeof  Product): boolean
 {
-    if (product.price < 0 || (product.discontPrice != "" && product.disontPrice < 0) || product.inStock < 0 || 
-        product.orderCount < 0)
-    {
-        return false;
-    }
-    return true;
+    return !(product.price < 0 || (product.discontPrice != "" && product.disontPrice < 0) || product.inStock < 0 ||
+        product.orderCount < 0);
 }
 
-export async function  HandlePostRequest(request :any, response: any, user: typeof User)
+export async function  HandlePostRequest(request: any, response: any, user: typeof User): Promise<any>
 {
     if (user == null || user.role != "admin")
     {
@@ -76,8 +73,8 @@ export async function  HandlePostRequest(request :any, response: any, user: type
         response.end('У вас не прав доступа');
         return;
     }
-    let url = require('url').parse(request.url, true);
-    let data = await readRequestData(request);
+    const url = require('url').parse(request.url, true);
+    const data = await readRequestData(request);
     let foundProduct, email, password, nextId
     try {
         switch (url.pathname)
@@ -88,7 +85,7 @@ export async function  HandlePostRequest(request :any, response: any, user: type
                     response.writeHead(304)
                     response.end("Неверные данные продукта")
                 }
-                let imageUrl = "./assets/img/" + data.name.split(" ").join("").toLowerCase() + ".jpg";
+                const imageUrl = "./assets/img/" + data.name.split(" ").join("").toLowerCase() + ".jpg";
                 saveImage(imageUrl, data.imageBytes);
                 nextId = await Product.max('id') + 1;
                 if (data.discontPrice == "")
@@ -111,7 +108,8 @@ export async function  HandlePostRequest(request :any, response: any, user: type
                 foundProduct = await Product.findOne({where: {id: data.id}})
                 if (foundProduct != null)
                 {
-                    await User.destroy({where: {id: data.id}})
+                    removeImage(foundProduct.imgUrl);
+                    await Product.destroy({where: {id: data.id}})
                     console.log("Removed product (" + foundProduct.name + ") by admin: " + decrypt(user.email))
                     redirectTo(response, '/admin/products')
                 }
@@ -134,7 +132,7 @@ export async function  HandlePostRequest(request :any, response: any, user: type
                 foundProduct = await Product.findOne({where: {id: data.id}})
                 if (foundProduct != null)
                 {
-                    let imageUrl = "./assets/img/" + data.name.split(" ").join("").toLowerCase() + ".jpg";
+                    const imageUrl = "./assets/img/" + data.name.split(" ").join("").toLowerCase() + ".jpg";
                     if (data.imageBytes != "")
                     {
                         removeImage(foundProduct.imgUrl);
@@ -167,10 +165,10 @@ export async function  HandlePostRequest(request :any, response: any, user: type
                 redirectTo(response, '/admin/users')
                 break;
             case "/admin/users/del":
-                let foundUser = await User.findOne({where: {id: data.id}})
+                const foundUser = await User.findOne({where: {id: data.id}})
                 if (foundUser != null)
                 {
-                    User.destroy({where: {id: data.id}})
+                    await User.destroy({where: {id: data.id}})
                     console.log("Removed user (" + decrypt(foundUser.email) + ") by admin: " + decrypt(user.email))
                     redirectTo(response, '/admin/users')
                 }

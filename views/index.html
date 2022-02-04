@@ -16,11 +16,12 @@
                 <div class="row" style="margin-bottom: 40px;">
                     <div class="col-md-6">
                         <section class="contact-clean" style="background: rgba(241,247,252,0);padding-top: 20px;">
-                            <form class="flex-fill" method="post" id="feedbackform" style="border-radius: 12px;max-width: 700px;margin-right: 0px;margin-left: 0px;width: auto;">
+                            <form class="flex-fill needs-validation" method="post" id="feedbackform" style="border-radius: 12px;max-width: 700px;margin-right: 0px;margin-left: 0px;width: auto;">
                                 <h2 class="text-center" style="color: rgb(0,0,0);font-size: 25px;">Мы всегда открыты для пожеланий и предложений</h2>
-                                <div class="mb-3"><input class="form-control" type="text" name="name" placeholder="Ваше имя"></div>
-                                <div class="mb-3"><input class="form-control is-invalid" type="email" name="email" placeholder="Ваш E-mail"><small class="form-text text-danger">Пожалуйста, введите корректный адрес e-mail для обратной связи</small></div>
-                                <div class="mb-3"><textarea class="form-control" name="message" placeholder="Ваше сообщение" rows="14" style="max-height: 225px;"></textarea></div>
+                                <div class="mb-3"><input class="form-control" type="text" name="name" placeholder="Ваше имя" required></div>
+                                <div class="mb-3"><input class="form-control" type="email" name="email" placeholder="Ваш E-mail" required>
+                                    <small class="form-text text-danger visually-hidden">Пожалуйста, введите корректный адрес e-mail для обратной связи</small></div>
+                                <div class="mb-3"><textarea class="form-control" name="message" placeholder="Ваше сообщение" rows="14" style="max-height: 248px;" required></textarea></div>
                                 <div class="mb-3"><button class="btn btn-primary" type="submit">Отправить</button></div>
                                 <div class="alert alert-danger d-flex flex-row visually-hidden visible" role="alert" data-aos="fade" id="feedbackfail">
                                     <span><strong>Введите корректный email</strong>!</span>
@@ -45,7 +46,6 @@
     </div>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/js/bs-init.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/liSbs/aos/2.3.4/aos.js"></script>
     <script src="assets/js/cart.js"></script>
     <script src="assets/js/index.js"></script>
 </body>

@@ -2,15 +2,15 @@
 import {User} from "./models";
 import {redirectTo} from "./router";
 
-const sha1 = require('sha1');
+import sha1 from 'sha1';
 
 const cookieTimeout = 10000;
 
-export async function verifyUser(cookies: any)
+export async function verifyUser(cookies: any): Promise<any>
 {
     if (cookies["login"] != undefined )
     {
-        let user = await User.findOne({where: {cookie: cookies["login"]}});
+        const user = await User.findOne({where: {cookie: cookies["login"]}});
         if (user == undefined)
         {
             return null;
@@ -25,17 +25,17 @@ export async function verifyUser(cookies: any)
     return null;
 }
 
-export async function authentificateUser(user: any | null, response: any, data: any) {
+export async function authentificateUser(user: any | null, response: any, data: any): Promise<any> {
     if (user != undefined) {
         redirectTo(response, "/index");
     } else {
-        let emailHash = encrypt(data.email.toString());
-        let passwordHash = encrypt(data.password.toString());
+        const emailHash = encrypt(data.email.toString());
+        const passwordHash = encrypt(data.password.toString());
         user = await User.findOne({where: {email: emailHash.content, password: passwordHash.content}});
         if (user != null) {
             let date = new Date();
             date = new Date(date.getTime() + cookieTimeout * 1000);
-            let hash = sha1(user.name + Date.now().toString() + user.password);
+            const hash = sha1(user.name + Date.now().toString() + user.password);
             await User.update({cookie: hash, cookieExpire: date}, {
                 where: {
                     email: emailHash.content,
@@ -48,7 +48,7 @@ export async function authentificateUser(user: any | null, response: any, data: 
             console.log("User logged in successfully (" + user.name + ")");
         } else {
             response.writeHead(377);
-            response.end("login fail");
+            response.end("Неверный e-mail или пароль");
             console.log("User login fail  (" + data.email.toString() + ")");
         }
     }
