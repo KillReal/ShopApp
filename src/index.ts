@@ -1,7 +1,8 @@
-import {Cart, Feedback, Product, ProductList, User, Order} from "./models";
-import {HandleGetRequest, HandlePostRequest} from "./router";
-
 import http = require('http');
+import {
+  Cart, Feedback, Product, ProductList, User, Order,
+} from './models';
+import { HandleGetRequest, HandlePostRequest } from './router';
 
 User.hasMany(Cart);
 Cart.belongsTo(User);
@@ -23,12 +24,11 @@ Order.sync();
 
 const PORT = 8125;
 
-http.createServer(async function (request: any, response: any): Promise<any> {
-    switch (request.method)
-    {
-        case "GET": await HandleGetRequest(request, response); break;
-        case "POST": await HandlePostRequest(request, response); break;
-    }
-
+http.createServer(async (request: any, response: any): Promise<any> => {
+  switch (request.method) {
+    case 'GET': await HandleGetRequest(request, response); break;
+    case 'POST': await HandlePostRequest(request, response); break;
+    default: break;
+  }
 }).listen(PORT);
-console.log('Server running at http://127.0.0.1:' + PORT + '/');
+console.log(`Server running at http://127.0.0.1:${PORT}/`);

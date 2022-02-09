@@ -1,31 +1,65 @@
+<div class="modal fade" id="exampleModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><a id="ProductName"></a></h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-start">
+                <div class="col-sm-12 col-md-4 product-item w-100">
+                    <div class="row">
+                        <div class="col-md-12"><a class="product-image"><img id="ProductImage" src="" style="max-height: 450px"></a></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="product-description" id="ProductDescription"></p>
+                            <div class="row">
+                                <span class="product-in-stock mt-2 mb-2" style="" id="ProductCount">В наличии: 0 шт.</span>
+                                <div class="col-6">
+                                    <button class="btn btn-warning" type="button" id="ProductButton"
+                                            style="background: linear-gradient(rgb(219,221,97) 0%, rgb(227,218,0) 100%), rgb(188,208,62);color: rgb(0,0,0);border-radius: 11px;">В корзину</button>
+                                </div>
+                                <div class="col-6">
+                                    <p class="product-price" id="ProductPrice">0₽
+                                        <span class="product-discont-price" id="ProductDiscountPrice"></span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="container" style="min-width: 275px;">       
     <div id = "productlist" class="row product-list dev">
         <% products.forEach(function(product) { %>
-            <div class="col-sm-12 col-md-4 product-item animation-element slide-top-left">
-                <div class="product-container" style="border-radius: 12px;">
-                    <div class="row">
-                        <div class="col-md-12"><a class="product-image"><img src="<%=product.imgUrl %>"></a></div>
+            <div class="col-sm-12 col-md-4 product-item animation-element slide-top-left" style="cursor: pointer">
+                <div class="product-container" id="productCard-<%=product.id%>" style="border-radius: 12px;">
+                    <div class="row" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="ShowDetails('<%=product.id%>')">
+                        <div class="col-md-12"><a class="product-image"><img id="ProductImage-<%=product.id%>" src="<%=product.imgUrl %>"></a></div>
                     </div>
-                    <div class="row"> 
+                    <div class="row" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="ShowDetails('<%=product.id%>')"> 
                         <div class="col">
-                            <h2><a><%=product.name %></a></h2>
+                            <h2><a id="ProductName-<%=product.id%>"><%=product.name %></a></h2>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-12">
-                            <p class="product-description"><%=product.description %></p>
+                            <p class="product-description" id="ProductDescription-<%=product.id%>"><%=product.description %></p>
                             <div class="row">
-                                <span class="product-in-stock mt-2 mb-2" style="<%= product.inStock == 0 ? 'color: red; font-weight: 800' : '' %>">В наличии: <%=product.inStock %> шт.</span>
+                                <span class="product-in-stock mt-2 mb-2" id="ProductCount-<%=product.id%>" style="<%= product.inStock == 0 ? 'color: red; font-weight: 800' : '' %>">В наличии: <%=product.inStock %> шт.</span>
                                 <div class="col-6">
-                                    <button class="btn btn-warning" type="button" onclick="actionWithCart('createItem', '<%=product.id %>')" 
+                                    <button class="btn btn-warning" type="button" onclick="actionWithCart('createItem', '<%=product.id%>')" id="ProductButton-<%=product.id%>" 
                                                            style="background: linear-gradient(rgb(219,221,97) 0%, rgb(227,218,0) 100%), rgb(188,208,62);color: rgb(0,0,0);border-radius: 11px;">В корзину</button>
                                 </div>
-                                <div class="col-6">
-                                    <p class="product-price"><%=product.price %>₽
+                                <div class="col-6" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="ShowDetails('<%=product.id%>')">
+                                    <p class="product-price" id="ProductPrice-<%=product.id%>"><%=product.price %>₽
                                         <% if (product.discontPrice != null) {%>
-                                            <span class="product-discont-price"><%=product.discontPrice %>₽</span>
+                                            <span class="product-discont-price" id="ProductDiscountPrice-<%=product.id%>"><%=product.discontPrice %>₽</span>
                                         <%} else {%>
-                                            <span class="product-discont-price"></span>
+                                            <span class="product-discont-price" id="ProductDiscountPrice-<%=product.id%>"></span>
                                         <%}%>
                                     </p>
                                 </div>
