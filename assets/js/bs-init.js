@@ -1,9 +1,15 @@
 document.getElementById('header').setAttribute('style',
 	'padding-bottom:'+ document.getElementById('footer-body').clientHeight +'px;');
 
-window.onresize = function(event) {
+var resizer;
+function resizefooter(){
 	document.getElementById('header').setAttribute('style',
-		'padding-bottom:'+ document.getElementById('footer-body').clientHeight +'px;');
+		'padding-bottom:'+ document.getElementById('footer-body').clientHeight +'px;'); 
+}
+
+window.onresi = function(event) {
+	clearTimeout(resizer);
+	resizer = setTimeout(resizefooter, 300);
 }
 
 if (window.innerWidth < 1000) {

@@ -4,7 +4,7 @@ import {
   Cart, Feedback, getCartByUser, Order, Product, ProductList, User,
 } from './models';
 import {
-  checkEmail, parseCookies, renderPage, strigifyDateTime, validateValue,
+  checkEmail, parseCookies, renderPage, sortType, strigifyDateTime, validateValue,
 } from './tools';
 import { decrypt, encrypt } from './encryption';
 import { authentificateUser, verifyUser } from './Authentification';
@@ -74,7 +74,8 @@ export async function HandleGetRequest(request: any, response: any): Promise<any
     cartCount;
   data = undefined;
   cartCount = 0;
-  let errorMessage;
+  let errorMessage; let
+    filterParam;
   try {
     switch (url.pathname) {
       case '/':
@@ -90,7 +91,9 @@ export async function HandleGetRequest(request: any, response: any): Promise<any
           const cart = await getCartByUser(user);
           cartCount = cart.productCount;
         }
-        data = { products, cart: cartCount, email: userEmail };
+        data = {
+          products, cart: cartCount, email: userEmail, isFilter: false,
+        };
         break;
       case '/login':
         if (user != null) {
@@ -119,16 +122,36 @@ export async function HandleGetRequest(request: any, response: any): Promise<any
         break;
       case '/products':
         errorMessage = 'Failed to load products';
-        productList = await Product.findAll({ order: [['orderCount', 'DESC'], ['id', 'ASC']] });
-        if (user !== undefined) {
+        let filter = await readRequestData(request);
+        if (Object.keys(filter).length !== 0) filter = Object.values(filter)[0];
+        filterParam = [0, 0, 1, 0, false];
+        let filterName = 'name';
+        if (filter[0] == 1) filterName = 'price';
+        else if (filter[0] == 2) filterName = 'inStock';
+        if (filter != null && (filter.count < filterParam.length || filter.count > filterParam.length)) {
+          respondError(response, 'Неверные параметры фильтра');
+          return;
+        }
+        if (filter != null) filterParam = filter;
+        const filterType = parseInt(filterParam[0]) + 1;
+        productList = await Product.findAll({ order: [[filterName, sortType(filterParam[filterType])]] });
+        if (filterParam[4]) {
+          for (const product of productList) {
+            if (product.inStock === '0') productList.splice(productList.indexOf(product), 1);
+          }
+        }
+        if (user !== null) {
           const cart = await getCartByUser(user);
           cartCount = cart.productCount;
         }
-        data = { products: productList, cart: cartCount, email: userEmail };
+        filePath = 'views/products.html';
+        data = {
+          products: productList, cart: cartCount, email: userEmail, isFilter: true, filterParam,
+        };
         break;
       case '/profile':
         errorMessage = 'Failed to load profile';
-        if (user !== undefined) {
+        if (user !== null) {
           const cart = await getCartByUser(user);
           data = { cart: cart.productCount, email: decrypt(user.email), isAdmin: user.role.match('admin') };
           filePath = './views/profile.html';
@@ -136,7 +159,7 @@ export async function HandleGetRequest(request: any, response: any): Promise<any
         break;
       case '/cart':
         errorMessage = 'Failed to load cart products';
-        if (user !== undefined) {
+        if (user !== null) {
           const cart = await getCartByUser(user);
           const products = await ProductList.findAll({ where: { CartId: cart.id }, include: Product });
           let total = 0;
@@ -153,7 +176,7 @@ export async function HandleGetRequest(request: any, response: any): Promise<any
         }
         break;
       case '/orders':
-        if (user !== undefined) {
+        if (user !== null) {
           const cart = await getCartByUser(user);
           const orders = await Order.findAll({ order: [['createdAt', 'DESC']], include: { model: Cart, where: { UserId: user.id } } });
           for (const order of orders) {
@@ -172,7 +195,7 @@ export async function HandleGetRequest(request: any, response: any): Promise<any
         } else { redirectTo(response, '/login'); }
         break;
       case '/order':
-        if (user !== undefined) {
+        if (user !== null) {
           data = await readRequestData(request);
           if (!validateValue(response, data.id)) { return; }
           const order = await Order.findOne({ where: { id: data.id } });
@@ -224,7 +247,7 @@ export async function HandlePostRequest(request: any, response: any): Promise<an
       case '/purchase':
         errorMessage = 'Failed to order';
         let isFail = false;
-        if (user !== undefined) {
+        if (user !== null) {
           if (!validateValue(response, data.name, 'Поле ФИО не может быть пустым, либо слишком длинным')) { return; }
           if (!validateValue(response, data.address, 'Поле адрес не может быть пустым, либо слишком длинным')) { return; }
           if (!validateValue(response, data.postCode, 'Поле почтовый индекс не может быть пустым, либо слишком длинным')) { return; }

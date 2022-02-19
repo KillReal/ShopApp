@@ -64,6 +64,13 @@ export function checkEmail(response: any, email: string, message: any = 'Нев�
   return true;
 }
 
+export function sortType(value :any):any {
+  if (value == 0) {
+    return 'DESC';
+  }
+  return 'ASC';
+}
+
 export function validateValue(response: any, value: any, message = 'Ошибка в обработке запроса', minLen = 0, maxLen = 255): boolean {
   if (value === undefined || value === '' || value === null || value.length < minLen || value.length > maxLen) {
     respondError(response, message);

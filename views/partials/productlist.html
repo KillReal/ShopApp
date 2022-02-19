@@ -32,8 +32,36 @@
         </div>
     </div>
 </div>
-<div class="container" style="min-width: 275px;">       
-    <div id = "productlist" class="row product-list dev">
+<div class="container" style="min-width: 275px;">
+    <div id="productlist" class="row product-list dev">
+        <% if (isFilter) {%>
+            <div class="d-flex flex-row flex-wrap product-list col-sm-12 col-md-4 filter" id="filterPanel" style="white-space: nowrap">
+                <% if (filterParam[1] == '0') {%>
+                    <button class="btn" onclick="updateFilter('nameBtn')"><i id="nameBtn" class="fa fa-arrow-up"></i> Название</button>
+                <% } else { %>
+                    <button class="btn" onclick="updateFilter('nameBtn')"><i id="nameBtn" class="fa fa-arrow-down"></i> Название</button>
+                <% } %>
+                <% if (filterParam[2] == '0') {%>
+                    <button class="btn" onclick="updateFilter('priceBtn')"><i id="priceBtn" class="fa fa-arrow-up"></i> Цена</button>
+                <% } else { %>
+                    <button class="btn" onclick="updateFilter('priceBtn')"><i id="priceBtn" class="fa fa-arrow-down"></i> Цена</button>
+                <% } %>
+                <% if (filterParam[3] == '0') {%>
+                    <button class="btn" onclick="updateFilter('stockBtn')"><i id="stockBtn" class="fa fa-arrow-up"></i> Запасы</button>
+                <% } else { %>
+                    <button class="btn" onclick="updateFilter('stockBtn')"><i id="stockBtn" class="fa fa-arrow-down"></i> Запасы</button>
+                <% } %>
+                <div class="d-flex align-items-center">
+                    <div class="vr"></div>
+                    <% if (filterParam[4] == 'true') {%>
+                        <input class="form-check-input" type="checkbox" checked id="onlyInStock" onclick="updateFilter('onlyInStock')" style="margin-right: 10px; margin-left: 10px">
+                    <% } else { %>
+                        <input class="form-check-input" type="checkbox" id="onlyInStock" onclick="updateFilter('onlyInStock')" style="margin-right: 10px; margin-left: 10px">
+                    <% } %>
+                    <label class="form-check-label" for="onlyInStock">Только в наличии</label>
+                </div>
+            </div>
+        <% } %>
         <% products.forEach(function(product) { %>
             <div class="col-sm-12 col-md-4 product-item animation-element slide-top-left" style="cursor: pointer">
                 <div class="product-container" id="productCard-<%=product.id%>" style="border-radius: 12px;">
