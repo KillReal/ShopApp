@@ -1,10 +1,15 @@
 import * as fs from 'fs';
 import ejs from 'ejs';
-import { respondError } from './router';
+
+function respondError(response: any, message: string): void {
+  response.writeHead(303);
+  response.end(message);
+}
 
 export function parseCookies(str: any): any {
   const rx = /([^;=\s]*)=([^;]*)/g;
   const obj: any = { };
+  // eslint-disable-next-line no-cond-assign
   for (let m; m = rx.exec(str);) { obj[m[1]] = decodeURIComponent(m[2]); }
   return obj;
 }
@@ -65,7 +70,7 @@ export function checkEmail(response: any, email: string, message: any = 'Нев�
 }
 
 export function sortType(value :any):any {
-  if (value == 0) {
+  if (value === '0') {
     return 'DESC';
   }
   return 'ASC';

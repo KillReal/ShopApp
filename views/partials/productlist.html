@@ -59,6 +59,12 @@
                         <input class="form-check-input" type="checkbox" id="onlyInStock" onclick="updateFilter('onlyInStock')" style="margin-right: 10px; margin-left: 10px">
                     <% } %>
                     <label class="form-check-label" for="onlyInStock">Только в наличии</label>
+                    <% if (filterParam[5] == 'true') {%>
+                    <input class="form-check-input" type="checkbox" checked id="onlyDiscontPrice" onclick="updateFilter('onlyDiscontPrice')" style="margin-right: 10px; margin-left: 10px">
+                    <% } else { %>
+                    <input class="form-check-input" type="checkbox" id="onlyDiscontPrice" onclick="updateFilter('onlyDiscontPrice')" style="margin-right: 10px; margin-left: 10px">
+                    <% } %>
+                    <label class="form-check-label" for="onlyDiscontPrice">Только со скидкой</label>
                 </div>
             </div>
         <% } %>

@@ -9,7 +9,7 @@ function updateFilter(elementId)
 {
     let filter = [];
     let sender = document.getElementById(elementId);
-    if (elementId != 'onlyInStock')
+    if (elementId !== 'onlyInStock' && elementId !== 'onlyDiscontPrice')
     {
         if (getState(sender))
         {
@@ -32,8 +32,9 @@ function updateFilter(elementId)
     filter[2] = getState(document.getElementById('priceBtn'));
     filter[3] = getState(document.getElementById('stockBtn'));
     filter[4] = document.getElementById('onlyInStock').checked;
+    filter[5] = document.getElementById('onlyDiscontPrice').checked;
     
     let url = '/products?filterParam[]=' + filter[0] + '&filterParam[]=' + filter[1] + '&filterParam[]=' + filter[2] + 
-        '&filterParam[]='+ filter[3] + '&filterParam[]='+ filter[4];
+        '&filterParam[]='+ filter[3] + '&filterParam[]='+ filter[4] + '&filterParam[]=' + filter[5];
     window.location.href = url;
 }

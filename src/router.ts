@@ -8,6 +8,7 @@ import {
 } from './tools';
 import { decrypt, encrypt } from './encryption';
 import { authentificateUser, verifyUser } from './Authentification';
+// eslint-disable-next-line import/no-cycle
 import { HandleGetRequest as HandleAdminGetRequest, HandlePostRequest as HandleAdminPostRequest } from './adminRouter';
 
 export function readRequestData(request: any): any {
@@ -58,7 +59,8 @@ export function getFilePath(url: any): string {
 
 export async function HandleGetRequest(request: any, response: any): Promise<any> {
   const cookies = parseCookies(request.headers.cookie);
-  const url = require('url').parse(request.url, true);
+  const baseURL = `http://${request.headers.host}/`;
+  const url = new URL(request.url, baseURL);
   console.log('GET ', url.pathname);
   const user = await verifyUser(cookies);
   let userEmail = '';
@@ -113,7 +115,7 @@ export async function HandleGetRequest(request: any, response: any): Promise<any
           console.log(`User ${decrypt(user.email)} logged off`);
         }
         redirectTo(response, '/index');
-        break;
+        return;
       case '/registration':
         filePath = 'views/login.html';
         data = {
@@ -123,22 +125,29 @@ export async function HandleGetRequest(request: any, response: any): Promise<any
       case '/products':
         errorMessage = 'Failed to load products';
         let filter = await readRequestData(request);
-        if (Object.keys(filter).length !== 0) filter = Object.values(filter)[0];
-        filterParam = [0, 0, 1, 0, false];
+        if (Object.keys(filter).length !== 0) {
+          const [first] = Object.values(filter);
+          filter = first;
+        }
+
+        filterParam = [0, 0, 1, 0, false, false];
         let filterName = 'name';
-        if (filter[0] == 1) filterName = 'price';
-        else if (filter[0] == 2) filterName = 'inStock';
+        if (filter[0] === '1') filterName = 'price';
+        else if (filter[0] === '2') filterName = 'inStock';
         if (filter != null && (filter.count < filterParam.length || filter.count > filterParam.length)) {
           respondError(response, 'Неверные параметры фильтра');
           return;
         }
         if (filter != null) filterParam = filter;
-        const filterType = parseInt(filterParam[0]) + 1;
+        const filterType = parseInt(filterParam[0], 10) + 1;
         productList = await Product.findAll({ order: [[filterName, sortType(filterParam[filterType])]] });
-        if (filterParam[4]) {
-          for (const product of productList) {
-            if (product.inStock === '0') productList.splice(productList.indexOf(product), 1);
-          }
+        if (filterParam[4] === 'true') {
+          const tempProductList = productList;
+          productList = tempProductList.filter((product :typeof Product) => product.inStock > 0);
+        }
+        if (filterParam[5] === 'true') {
+          const tempProductList = productList;
+          productList = tempProductList.filter((product :typeof Product) => product.discontPrice != null);
         }
         if (user !== null) {
           const cart = await getCartByUser(user);
@@ -155,7 +164,9 @@ export async function HandleGetRequest(request: any, response: any): Promise<any
           const cart = await getCartByUser(user);
           data = { cart: cart.productCount, email: decrypt(user.email), isAdmin: user.role.match('admin') };
           filePath = './views/profile.html';
-        } else { redirectTo(response, '/login'); }
+        } else {
+          redirectTo(response, '/login');
+        }
         break;
       case '/cart':
         errorMessage = 'Failed to load cart products';
@@ -192,7 +203,10 @@ export async function HandleGetRequest(request: any, response: any): Promise<any
             orders, ordersDates, cart: cart.productCount, email: userEmail,
           };
           filePath = './views/orders.html';
-        } else { redirectTo(response, '/login'); }
+        } else {
+          redirectTo(response, '/login');
+          return;
+        }
         break;
       case '/order':
         if (user !== null) {
@@ -219,7 +233,10 @@ export async function HandleGetRequest(request: any, response: any): Promise<any
             productlists: products, totalprice: total, cart: cart.productCount, email: userEmail, isOrder: true, orderDate,
           };
           filePath = './views/cart.html';
-        } else { redirectTo(response, '/login'); }
+        } else {
+          redirectTo(response, '/login');
+          return;
+        }
         break;
       default:
         break;
@@ -233,7 +250,8 @@ export async function HandleGetRequest(request: any, response: any): Promise<any
 
 export async function HandlePostRequest(request: any, response: any): Promise<any> {
   const cookies = parseCookies(request.headers.cookie);
-  const url = require('url').parse(request.url, true);
+  const baseURL = `http://${request.headers.host}/`;
+  const url = new URL(request.url, baseURL);
   console.log('POST ', url.pathname);
   const user = await verifyUser(cookies);
   if (/^\/admin.*/.test(url.pathname)) {
@@ -257,13 +275,14 @@ export async function HandlePostRequest(request: any, response: any): Promise<an
             include: Product,
           });
           let totalCounts = 0;
-          for (const product of productList) {
+          const promises = productList.map(async (product: typeof Product) => {
             if (product.productCount > product.Product.inStock) {
               isFail = true;
               await ProductList.update({ productCount: product.Product.inStock }, { where: { id: product.id } });
             }
             totalCounts += product.productCount;
-          }
+          });
+          await Promise.all(promises);
           if (isFail) {
             respondError(response, 'Некоторых товаров не оказалось на складе');
             console.log(`Failed to order cart (ID:${cart.id})`);
@@ -276,13 +295,18 @@ export async function HandlePostRequest(request: any, response: any): Promise<an
 
           await Cart.update({ isPurchased: true, date: Date.now() }, { where: { id: cart.id } });
           let totalPrice = 0;
-          for (const product of productList) {
+          const promises1 = productList.map(async (product: typeof Product) => {
             await Product.update(
               { inStock: product.Product.inStock - product.productCount, orderCount: product.Product.orderCount + product.productCount },
               { where: { id: product.Product.id } },
             );
-            if (product.Product.discontPrice == null) { totalPrice += product.Product.price * product.productCount; } else { totalPrice += product.Product.discontPrice * product.productCount; }
-          }
+            if (product.Product.discontPrice == null) {
+              totalPrice += product.Product.price * product.productCount;
+            } else {
+              totalPrice += product.Product.discontPrice * product.productCount;
+            }
+          });
+          await Promise.all(promises1);
           const nextId = await Order.max('id') + 1;
           const name = encrypt(data.name.toString());
           const address = encrypt(data.address.toString());

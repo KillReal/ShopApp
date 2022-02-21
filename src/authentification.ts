@@ -1,14 +1,19 @@
 import sha1 from 'sha1';
 import { encrypt } from './encryption';
 import { User } from './models';
-import { redirectTo } from './router';
 
 const cookieTimeout = 10000;
+
+function redirectTo(response: any, url: string): void {
+  response.statusCode = 302;
+  response.setHeader('Location', url);
+  response.end();
+}
 
 export async function verifyUser(cookies: any): Promise<any> {
   if (cookies.login !== undefined) {
     const user = await User.findOne({ where: { cookie: cookies.login } });
-    if (user === undefined) {
+    if (user === null) {
       return null;
     }
     if (user.cookieExpire < Date.now()) {
@@ -26,11 +31,11 @@ export async function authentificateUser(user: any | null, response: any, data: 
   } else {
     const emailHash = encrypt(data.email.toString());
     const passwordHash = encrypt(data.password.toString());
-    user = await User.findOne({ where: { email: emailHash.content, password: passwordHash.content } });
-    if (user != null) {
+    const newuser = await User.findOne({ where: { email: emailHash.content, password: passwordHash.content } });
+    if (newuser != null) {
       let date = new Date();
       date = new Date(date.getTime() + cookieTimeout * 1000);
-      const hash = sha1(user.name + Date.now().toString() + user.password);
+      const hash = sha1(newuser.name + Date.now().toString() + newuser.password);
       await User.update({ cookie: hash, cookieExpire: date }, {
         where: {
           email: emailHash.content,
@@ -40,7 +45,7 @@ export async function authentificateUser(user: any | null, response: any, data: 
       response.setHeader('Set-Cookie', `login=${hash}; Max-Age=${cookieTimeout}; HttpOnly, Secure`);
       response.writeHead(301, { Location: '/index' });
       response.end('Success');
-      console.log(`User logged in successfully (${user.name})`);
+      console.log(`User logged in successfully (${newuser.name})`);
     } else {
       response.writeHead(377);
       response.end('Неверный e-mail или пароль');

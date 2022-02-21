@@ -17,8 +17,8 @@ export async function HandleGetRequest(request: any, response: any, user: typeof
     return;
   }
 
-  const url = require('url').parse(request.url, true);
-
+  const baseURL = `http://${request.headers.host}/`;
+  const url = new URL(request.url, baseURL);
   const filePath = getFilePath(request.url);
   try {
     switch (url.pathname) {
@@ -79,7 +79,8 @@ export async function HandlePostRequest(request: any, response: any, user: typeo
     response.end('У вас не прав доступа');
     return;
   }
-  const url = require('url').parse(request.url, true);
+  const baseURL = `http://${request.headers.host}/`;
+  const url = new URL(request.url, baseURL);
   const data = await readRequestData(request);
   let foundProduct; let email; let password; let
     nextId;
